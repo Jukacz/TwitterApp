@@ -44,7 +44,6 @@ yarn-error.log*
 
 __pycache__/
 migrations/
-technihub.db
 /.pnp.cjs
 /.yarn/cache/@remix-run-router-npm-1.0.2-b6e51d83e7-bf410f9cbb.zip
 /.yarn/install-state.gz
@@ -56,3 +55,7 @@ backend/cheat_sheets
 /backend/logs.txt
 
 /backend/backend/__pycache__
+.vscode
+
+/frontend/node_modules
+backend/db.sqlite3
