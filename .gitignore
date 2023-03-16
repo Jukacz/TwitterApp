@@ -1,0 +1,58 @@
+#Python files to be ignored by git
+/venv/
+#END: Python files to be ignored by git
+
+# React files to be ignored by git
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+/frontend/yarn.lock
+/frontend/.yarn/
+# END: React files to be ignored by git
+
+# JetBrains idea
+.idea/
+# END: JetBrains idea
+
+# Django files to be ignored by git
+/backend/db.sqlite3
+# END: Django files to be ignored by git
+
+
+/.pytest_cache/
+
+__pycache__/
+migrations/
+technihub.db
+/.pnp.cjs
+/.yarn/cache/@remix-run-router-npm-1.0.2-b6e51d83e7-bf410f9cbb.zip
+/.yarn/install-state.gz
+/.yarn/cache/react-router-dom-npm-6.4.2-ccbb9d5e90-858e6a5c4c.zip
+/.yarn/cache/react-router-npm-6.4.2-11c708cead-c229d65d9b.zip
+
+backend/cheat_sheets
+/backend/generated/
+/backend/logs.txt
+
+/backend/backend/__pycache__
