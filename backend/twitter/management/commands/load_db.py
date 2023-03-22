@@ -16,13 +16,17 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR('Users already exist in database'))
             return
         
-        twitter_user1 = TwitterUser.objects.create(user=user1, slug='edgzoah')
-        twitter_user2 = TwitterUser.objects.create(user=user2, slug='grubas')
+        twitter_user1 = TwitterUser.objects.create(user=user1)
+        twitter_user2 = TwitterUser.objects.create(user=user2)
 
         tweet1 = Tweet.objects.create(user=twitter_user1, content='This is a tweet')
         tweet2 = Tweet.objects.create(user=twitter_user2, content='This is another tweet')
+        tweet3 = Tweet.objects.create(user=twitter_user2, content='This is a third tweet')
+        tweet4 = Tweet.objects.create(user=twitter_user2, content='This is a fourth tweet')
         tweet1.save()
         tweet2.save()
+        tweet3.save()
+        tweet4.save()
 
         relationship1 = Relationship.objects.create(follower=twitter_user1, following=twitter_user2)
         relationship2 = Relationship.objects.create(follower=twitter_user2, following=twitter_user1)

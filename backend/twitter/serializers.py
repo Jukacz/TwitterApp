@@ -8,26 +8,19 @@ class UserLoginSerializer(serializers.ModelSerializer):
         fields = ('username', 'password')
 
 class TweetSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.user.username')
     class Meta:
         model = Tweet
-        fields = ('content', 'created_at')
+        fields = ('content', 'created_at', 'username')
 
 class TwitterFollowingSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='following.user.username')
-    slug = serializers.CharField(source='following.slug')
     class Meta:
         model = Relationship
-        fields = ('username', 'slug')
+        fields = ('username')
 
 class TwitterFollowerSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='follower.user.username')
-    slug = serializers.CharField(source='follower.slug')
     class Meta:
         model = Relationship
-        fields = ('username', 'slug')
-
-class TwitterUserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username')
-    class Meta:
-        model = TwitterUser
-        fields = ('username', 'slug')
+        fields = ('username')
