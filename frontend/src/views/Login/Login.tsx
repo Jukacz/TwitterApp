@@ -7,8 +7,11 @@ import UserContext from "../../contexts/user.context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import Cookies from "cookies-js";
 
 const Login: React.FC = () => {
+
+  Cookies.get("csrftoken")
   const context = useContext(UserContext);
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -27,9 +30,13 @@ const Login: React.FC = () => {
   const login = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const response = await axios
-      .post("/login", {
+      .post("/login/", {
         username,
         password,
+      }, {
+        headers: {
+          "X-CSRFToken": Cookies.get("csrftoken")
+        }
       })
       .catch((err) => err.response);
 
