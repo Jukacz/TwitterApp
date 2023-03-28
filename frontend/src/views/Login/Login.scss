@@ -1,7 +1,7 @@
 .login-container {
   min-height: 100vh;
   position: relative;
-  background-color: rgb(247, 247, 247);
+  background-color: rgb(14, 14, 14);
 
   .login-box {
     position: absolute;
@@ -60,6 +60,7 @@
             margin: 0;
             margin-bottom: 5px;
             color: #575757;
+            text-align: left;
             font-family: "Open Sans", sans-serif;
           }
           input {
@@ -132,6 +133,8 @@
       align-items: center;
       padding: 10px;
       border-radius: 10px;
+      // when shirnk div shrink from right side
+      flex-shrink: 0;
 
       h2 {
         font-size: 2.5rem;
