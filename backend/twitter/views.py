@@ -80,4 +80,33 @@ class UserFollowingView(generics.GenericAPIView):
         following = Relationship.objects.filter(follower=twitter_user)
         data = self.serializer_class(following, many=True).data
         return Response({'following': data}, status=HTTP_200_OK)
+
+class CreateRelationshipView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = get_object_or_404(User, id=request.data.get('user_id'))
+        twitter_user = TwitterUser.objects.get(user=user)
+        follower = TwitterUser.objects.get(user=request.user)
+        relationship = Relationship(follower=follower, following=twitter_user)
+        relationship.save()
+        return Response(status=HTTP_200_OK)
     
+    def delete(self, request):
+        user = get_object_or_404(User, id=request.data.get('user_id'))
+        twitter_user = TwitterUser.objects.get(user=user)
+        follower = TwitterUser.objects.get(user=request.user)
+        relationship = Relationship.objects.get(follower=follower, following=twitter_user)
+        relationship.delete()
+        return Response(status=HTTP_200_OK)
+
+class CreateTweetView(generics.GenericAPIView):
+    serializer_class = TweetSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = TwitterUser.objects.get(user=request.user)
+        tweet = Tweet(user=user, content=request.data.get('content'))
+        tweet.save()
+        data = self.serializer_class(tweet).data
+        return Response(data, status=HTTP_200_OK)
