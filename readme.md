@@ -1,5 +1,5 @@
 # Twitter App
-Tomasz Ogrodnik, Kacper Śmielak, Adam Blady
+Tomasz Ogrodnik (Jukacz), Kacper Śmielak (Smieluuu), Adam Blady (edgzoah)
 ## About
 A site through which you will be able to manage various things. In version one, we are implementing the ability to send downloads for approval.
 
