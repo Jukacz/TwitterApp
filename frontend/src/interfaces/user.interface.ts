@@ -1,6 +1,14 @@
+import React from "react";
+
 export interface User {
-  id: number | undefined;
-  name: string | undefined;
-  email: string | undefined;
-  isLogged: boolean | undefined;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  isLogged: boolean;
+}
+
+export interface UserContextInterface {
+  user: User;
+  setUser: (user: User) => void;
 }

@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Dashboard, Login } from "./views";
 import { User } from "./interfaces/user.interface";
@@ -9,11 +9,12 @@ import UserContext from "./contexts/user.context";
 import axios from "axios";
 
 function App() {
-  const [user, setUser] = React.useState<User>({
-    id: 0,
-    name: "",
+  const [user, setUser] = useState<User>({
+    username: "",
     email: "",
     isLogged: false,
+    first_name: "",
+    last_name: "",
   });
 
   useEffect(() => {
@@ -23,12 +24,17 @@ function App() {
 
   const location = useLocation();
 
+  useEffect(() => {
+    console.log("user", user);
+  }, [user]);
+
   return (
     <div className="App">
       <ChakraProvider>
         <UserContext.Provider
           value={{
-            ...user,
+            user,
+            setUser,
           }}
         >
           <AnimatePresence mode="wait">

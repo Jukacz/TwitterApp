@@ -1,7 +1,7 @@
 import "./Login.scss";
 import React, { useContext, useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { useToast } from "@chakra-ui/react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useMediaQuery, useToast } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
@@ -11,9 +11,11 @@ import {
   animationLoginBoxConfig,
   animationTextContainerConfig,
 } from "./animationsConfig";
-import axios from "axios";
+import axios, { Axios, AxiosStatic } from "axios";
 import UserContext from "../../contexts/user.context";
 import Cookies from "cookies-js";
+import { JoiInput } from "../../components";
+import { User } from "../../interfaces/user.interface";
 
 const Login: React.FC = () => {
   Cookies.get("csrftoken");
@@ -21,6 +23,10 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  let [isGoingToRegister, setIsGoingToRegister] = useState<boolean>(false);
+  const [isPhone] = useMediaQuery("(min-width: 951px)");
 
   const toast = useToast({ isClosable: true });
 
@@ -28,12 +34,11 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     document.title = "Login";
-
-    context?.isLogged && navigateTo("/");
   }, []);
 
   const login = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     const response = await axios
       .post(
         "/login/",
@@ -55,21 +60,22 @@ const Login: React.FC = () => {
         status: "success",
       });
       navigateTo("/");
+      const userFromRequest: User = response.data.user;
+      context?.setUser(userFromRequest);
       return;
     }
     toast({
       title: "Logowanie nieudane",
       status: "error",
     });
+    setLoading(false);
   };
   return (
     <div className="login-container">
       <motion.div
-        initial="initial"
-        animate="animate"
-        exit="exit"
+        exit={!isGoingToRegister ? "exit" : "exitAlternative"}
         variants={animationLoginBoxConfig}
-        transition={{ duration: 0.3, delay: 0.8 }}
+        transition={{ duration: 0.3, delay: 0.8, ease: "easeInOut" }}
         className="login-box"
       >
         <motion.div
@@ -78,7 +84,7 @@ const Login: React.FC = () => {
           transition={{ duration: 0.2 }}
         >
           <FontAwesomeIcon icon={faTwitter} />
-          <p>Twitter</p>
+          {isPhone && <p>Twitter</p>}
         </motion.div>
         <div className="form-side">
           <motion.div
@@ -133,32 +139,52 @@ const Login: React.FC = () => {
               exit="exit"
               variants={animationFormConfig(0.6, 0.6)}
             >
-              <button className="submit-button" type="submit">
+              <button
+                className="submit-button"
+                type="submit"
+                disabled={loading}
+              >
                 Zaloguj się!
               </button>
             </motion.div>
           </form>
         </div>
-        <motion.div
-          className="text-side"
-          exit={{ width: 0, padding: 0 }}
-          transition={{ duration: 0.2, delay: 0.4 }}
-        >
-          <motion.div
-            exit="exit"
-            variants={animationTextContainerConfig}
-            transition={{ duration: 0.2, delay: 0.2 }}
-          >
-            <h2>Jesteś nowy?</h2>
-            <p>
-              Zarejestruj się, aby móc korzystać z naszych usług, a także
-              dodawać własne ogłoszenia.
-            </p>
-            <NavLink className="button-register" to="/register">
-              Zarejestru j się
+        <div className="register-side">
+          {isPhone ? (
+            <motion.div
+              className="text-side"
+              exit={{ width: 0, padding: 0 }}
+              transition={{ duration: 0.2, delay: 0.4 }}
+            >
+              <motion.div
+                exit="exit"
+                variants={animationTextContainerConfig}
+                transition={{ duration: 0.2, delay: 0.2 }}
+              >
+                <h2>Jesteś nowy?</h2>
+                <p>
+                  Zarejestruj się, aby móc korzystać z naszych usług, a także
+                  dodawać własne ogłoszenia.
+                </p>
+                <NavLink
+                  className="button-register"
+                  to="/register"
+                  onClick={() => setIsGoingToRegister(true)}
+                >
+                  Zarejestru j się
+                </NavLink>
+              </motion.div>
+            </motion.div>
+          ) : (
+            <NavLink
+              to="/register"
+              className="register-phone-link"
+              onClick={() => setIsGoingToRegister(true)}
+            >
+              Nie masz konta? Zarejestruj sie!
             </NavLink>
-          </motion.div>
-        </motion.div>
+          )}
+        </div>
       </motion.div>
     </div>
   );
