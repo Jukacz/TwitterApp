@@ -28,6 +28,10 @@ const animationLoginBoxConfig = {
     height: "100%",
     width: "100%",
   },
+  exitAlternative: {
+    height: "600px",
+    width: "1200px",
+  },
 };
 
 const animationTextContainerConfig = {

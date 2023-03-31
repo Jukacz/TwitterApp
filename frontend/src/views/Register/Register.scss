@@ -1,15 +1,16 @@
-.login-container {
+.register-container {
   min-height: 100vh;
   position: relative;
   background-color: rgb(14, 14, 14);
 
-  .login-box {
+  .register-box {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     display: flex;
-    height: 600px;
+    height: auto;
+    padding: 10px;
     border-radius: 10px;
     background-color: white;
 
@@ -183,7 +184,7 @@
   }
 
   @media only screen and (max-width: 950px) {
-    .login-box {
+    .register-box {
       flex-direction: column;
       height: 70vh;
       width: 80vw;

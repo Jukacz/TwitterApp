@@ -24,8 +24,8 @@ class LoginView(generics.GenericAPIView):
         if user:
             if user.is_active:
                 login(request, user)
-                return Response(status=HTTP_200_OK, data={'username': user.username, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name, "success": True})
-        return Response(None, status=HTTP_401_UNAUTHORIZED, data={'success': False})
+                return Response(status=HTTP_200_OK, data={'user': {'username': user.username, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name }, "success": True})
+        return Response(status=HTTP_401_UNAUTHORIZED, data={'success': False})
 
 class LogoutView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)

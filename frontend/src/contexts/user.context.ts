@@ -1,6 +1,6 @@
 import { createContext } from "react";
-import { User } from "../interfaces/user.interface";
+import { User, UserContextInterface } from "../interfaces/user.interface";
 
-const UserContext = createContext<User | null>(null);
+const UserContext = createContext<UserContextInterface | null>(null);
 
 export default UserContext;
