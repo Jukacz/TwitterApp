@@ -114,7 +114,7 @@ const Login: React.FC = () => {
               initial="initial"
               animate="animate"
               exit={!isGoingToRegister ? "exit" : ""}
-              variants={animationFormConfig(0.3, 0.3)}
+              variants={animationFormConfig(0.2, 0.2)}
             >
               <div className="input-group">
                 <p>Hasło</p>
@@ -136,7 +136,7 @@ const Login: React.FC = () => {
               initial="initial"
               animate="animate"
               exit={!isGoingToRegister ? "exit" : ""}
-              variants={animationFormConfig(0.5, 0.5)}
+              variants={animationFormConfig(0.3, 0.3)}
             >
               <button
                 className="submit-button"

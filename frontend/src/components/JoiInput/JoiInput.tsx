@@ -22,7 +22,9 @@ const JoiInput: React.FC<
           validateInput(e.target.value);
         }}
       />
-      <p className="error-message">{error}</p>
+      <p className="error-message" style={{ color: "red" }}>
+        {error}
+      </p>
     </>
   );
 };
