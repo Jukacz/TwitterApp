@@ -1,6 +1,6 @@
 import "./Login.scss";
 import React, { useContext, useEffect, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useMediaQuery, useToast } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
@@ -10,11 +10,10 @@ import {
   animationFormConfig,
   animationLoginBoxConfig,
   animationTextContainerConfig,
-} from "./animationsConfig";
-import axios, { Axios, AxiosStatic } from "axios";
+} from "../../animationsConfig/login-animations";
+import axios from "axios";
 import UserContext from "../../contexts/user.context";
 import Cookies from "cookies-js";
-import { JoiInput } from "../../components";
 import { User } from "../../interfaces/user.interface";
 
 const Login: React.FC = () => {
@@ -73,14 +72,14 @@ const Login: React.FC = () => {
   return (
     <div className="login-container">
       <motion.div
-        exit={!isGoingToRegister ? "exit" : "exitAlternative"}
+        exit={!isGoingToRegister ? "exit" : ""}
         variants={animationLoginBoxConfig}
         transition={{ duration: 0.3, delay: 0.8, ease: "easeInOut" }}
         className="login-box"
       >
         <motion.div
           className="twitter-icon"
-          exit={{ opacity: 0 }}
+          exit={isGoingToRegister ? "exit" : { opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
           <FontAwesomeIcon icon={faTwitter} />
@@ -90,7 +89,7 @@ const Login: React.FC = () => {
           <motion.div
             initial="initial"
             animate="animate"
-            exit="exit"
+            exit={!isGoingToRegister ? "exit" : ""}
             variants={animationFormConfig()}
           >
             <h1>Witaj Ponownie!</h1>
@@ -99,8 +98,8 @@ const Login: React.FC = () => {
             <motion.div
               initial="initial"
               animate="animate"
-              exit="exit"
-              variants={animationFormConfig(0.2, 0.2)}
+              exit={!isGoingToRegister ? "exit" : ""}
+              variants={animationFormConfig(0.1, 0.1)}
             >
               <div className="input-group">
                 <p>Nazwa Użytkownika</p>
@@ -114,8 +113,8 @@ const Login: React.FC = () => {
             <motion.div
               initial="initial"
               animate="animate"
-              exit="exit"
-              variants={animationFormConfig(0.4, 0.4)}
+              exit={!isGoingToRegister ? "exit" : ""}
+              variants={animationFormConfig(0.3, 0.3)}
             >
               <div className="input-group">
                 <p>Hasło</p>
@@ -136,8 +135,8 @@ const Login: React.FC = () => {
             <motion.div
               initial="initial"
               animate="animate"
-              exit="exit"
-              variants={animationFormConfig(0.6, 0.6)}
+              exit={!isGoingToRegister ? "exit" : ""}
+              variants={animationFormConfig(0.5, 0.5)}
             >
               <button
                 className="submit-button"
@@ -153,11 +152,11 @@ const Login: React.FC = () => {
           {isPhone ? (
             <motion.div
               className="text-side"
-              exit={{ width: 0, padding: 0 }}
+              exit={isGoingToRegister ? "" : { width: 0, padding: 0 }}
               transition={{ duration: 0.2, delay: 0.4 }}
             >
               <motion.div
-                exit="exit"
+                exit={!isGoingToRegister ? "exit" : ""}
                 variants={animationTextContainerConfig}
                 transition={{ duration: 0.2, delay: 0.2 }}
               >
