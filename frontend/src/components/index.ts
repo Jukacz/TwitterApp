@@ -1,3 +1,3 @@
 import JoiInput from "./JoiInput/JoiInput";
-
-export { JoiInput };
+import Sidebar from "./Sidebar/Sidebar";
+export { Sidebar, JoiInput };
