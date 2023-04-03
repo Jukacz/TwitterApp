@@ -1,5 +1,5 @@
 import "./Login.scss";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useMediaQuery, useToast } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -33,6 +33,14 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     document.title = "Login";
+    console.log(context?.user.isLogged);
+    if (context?.user.isLogged) {
+      navigateTo("/");
+      toast({
+        title: "Jesteś już zalogowany",
+        status: "info",
+      });
+    }
   }, []);
 
   const login = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -71,109 +79,58 @@ const Login: React.FC = () => {
   };
   return (
     <div className="login-container">
-      <motion.div
-        exit={!isGoingToRegister ? "exit" : ""}
-        variants={animationLoginBoxConfig}
-        transition={{ duration: 0.3, delay: 0.8, ease: "easeInOut" }}
-        className="login-box"
-      >
-        <motion.div
-          className="twitter-icon"
-          exit={isGoingToRegister ? "exit" : { opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+      <div className="login-box">
+        <div className="twitter-icon">
           <FontAwesomeIcon icon={faTwitter} />
           {isPhone && <p>Twitter</p>}
-        </motion.div>
+        </div>
         <div className="form-side">
-          <motion.div
-            initial="initial"
-            animate="animate"
-            exit={!isGoingToRegister ? "exit" : ""}
-            variants={animationFormConfig()}
-          >
-            <h1>Witaj Ponownie!</h1>
-          </motion.div>
+          <h1>Witaj Ponownie!</h1>
           <form onSubmit={login}>
-            <motion.div
-              initial="initial"
-              animate="animate"
-              exit={!isGoingToRegister ? "exit" : ""}
-              variants={animationFormConfig(0.1, 0.1)}
-            >
-              <div className="input-group">
-                <p>Nazwa Użytkownika</p>
-                <input
-                  type="text"
-                  placeholder="Twoja nazwa użytkownika"
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-            </motion.div>
-            <motion.div
-              initial="initial"
-              animate="animate"
-              exit={!isGoingToRegister ? "exit" : ""}
-              variants={animationFormConfig(0.2, 0.2)}
-            >
-              <div className="input-group">
-                <p>Hasło</p>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Twoje hasło"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <button
-                  className="show-password-button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  type="button"
-                >
-                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                </button>
-              </div>
-            </motion.div>
-            <motion.div
-              initial="initial"
-              animate="animate"
-              exit={!isGoingToRegister ? "exit" : ""}
-              variants={animationFormConfig(0.3, 0.3)}
-            >
+            <div className="input-group">
+              <p>Nazwa Użytkownika</p>
+              <input
+                type="text"
+                placeholder="Twoja nazwa użytkownika"
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+            <div className="input-group">
+              <p>Hasło</p>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Twoje hasło"
+                onChange={(e) => setPassword(e.target.value)}
+              />
               <button
-                className="submit-button"
-                type="submit"
-                disabled={loading}
+                className="show-password-button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                type="button"
               >
-                Zaloguj się!
+                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
               </button>
-            </motion.div>
+            </div>
+            <button className="submit-button" type="submit" disabled={loading}>
+              Zaloguj się!
+            </button>
           </form>
         </div>
         <div className="register-side">
           {isPhone ? (
-            <motion.div
-              className="text-side"
-              exit={isGoingToRegister ? "" : { width: 0, padding: 0 }}
-              transition={{ duration: 0.2, delay: 0.4 }}
-            >
-              <motion.div
-                exit={!isGoingToRegister ? "exit" : ""}
-                variants={animationTextContainerConfig}
-                transition={{ duration: 0.2, delay: 0.2 }}
+            <div className="text-side">
+              <h2>Jesteś nowy?</h2>
+              <p>
+                Zarejestruj się, aby móc korzystać z naszych usług, a także
+                dodawać własne ogłoszenia.
+              </p>
+              <NavLink
+                className="button-register"
+                to="/register"
+                onClick={() => setIsGoingToRegister(true)}
               >
-                <h2>Jesteś nowy?</h2>
-                <p>
-                  Zarejestruj się, aby móc korzystać z naszych usług, a także
-                  dodawać własne ogłoszenia.
-                </p>
-                <NavLink
-                  className="button-register"
-                  to="/register"
-                  onClick={() => setIsGoingToRegister(true)}
-                >
-                  Zarejestru j się
-                </NavLink>
-              </motion.div>
-            </motion.div>
+                Zarejestru j się
+              </NavLink>
+            </div>
           ) : (
             <NavLink
               to="/register"
@@ -184,7 +141,7 @@ const Login: React.FC = () => {
             </NavLink>
           )}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

@@ -33,6 +33,19 @@ class LogoutView(generics.GenericAPIView):
     def post(self, request):
         logout(request)
         return Response(status=HTTP_200_OK, data={'success': True})
+    
+class MyInformationsView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = request.user
+        data = {
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name
+        }
+        return Response(status=HTTP_200_OK, data={'success': True, "user": data })
 
 class FollowingView(generics.GenericAPIView):
     serializer_class = TweetSerializer

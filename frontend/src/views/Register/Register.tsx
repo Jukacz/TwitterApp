@@ -1,5 +1,5 @@
 import "./Register.scss";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
@@ -8,6 +8,8 @@ import { animationFormConfig } from "../../animationsConfig/login-animations";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import Joi from "joi";
 import { JoiInput } from "../../components";
+import UserContext from "../../contexts/user.context";
+import { useNavigate } from "react-router-dom";
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState<string>("");
@@ -20,6 +22,10 @@ const Register: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const toast = useToast({ isClosable: true });
+
+  const navigateTo = useNavigate();
+
+  const context = useContext(UserContext);
 
   let [isGoingToRegister, setIsGoingToRegister] = useState<boolean>(false);
   const [isPhone] = useMediaQuery("(min-width: 951px)");
@@ -83,6 +89,17 @@ const Register: React.FC = () => {
       return;
     }
   };
+
+  useEffect(() => {
+    if (context?.user.isLogged) {
+      navigateTo("/");
+      toast({
+        title: "Jesteś już zalogowany",
+        description: "Nie możesz utworzyć nowego konta",
+        status: "error",
+      });
+    }
+  }, []);
   return (
     <div className="register-container">
       <motion.div className="register-box">
