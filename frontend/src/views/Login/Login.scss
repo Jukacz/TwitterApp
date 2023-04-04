@@ -185,16 +185,20 @@
   @media only screen and (max-width: 950px) {
     .login-box {
       flex-direction: column;
-      height: 70vh;
+      height: auto + 100px;
       width: 80vw;
       .twitter-icon {
         position: static;
         justify-content: center;
 
         svg {
-          height: 10vw;
-          width: 10vw;
+          height: 12vw;
+          width: 12vw;
         }
+      }
+
+      h1 {
+        font-size: 1.5rem !important;
       }
 
       .form-side {
