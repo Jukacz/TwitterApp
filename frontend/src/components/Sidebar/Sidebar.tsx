@@ -18,23 +18,23 @@ const Sidebar: React.FC = () => {
       <div className="sidebar-menu">
         <ul>
           <li>
-            <FontAwesomeIcon icon={faHouse} />
+            <FontAwesomeIcon icon={faHouse} className="fa-icon" />
             <span>Home</span>
           </li>
           <li>
-            <FontAwesomeIcon icon={faHashtag} />
+            <FontAwesomeIcon icon={faHashtag} className="fa-icon" />
             <span>Explore</span>
           </li>
           <li>
-            <FontAwesomeIcon icon={faBell} />
+            <FontAwesomeIcon icon={faBell} className="fa-icon" />
             <span>Notifications</span>
           </li>
           <li>
-            <FontAwesomeIcon icon={faBookmark} />
+            <FontAwesomeIcon icon={faBookmark} className="fa-icon" />
             <span>Bookmarks</span>
           </li>
           <li>
-            <FontAwesomeIcon icon={faUser} />
+            <FontAwesomeIcon icon={faUser} className="fa-icon" />
             <span>Profile</span>
           </li>
         </ul>

@@ -9,6 +9,7 @@ import UserContext from "./contexts/user.context";
 import axios from "axios";
 import LoadingContext from "./contexts/loading.context";
 import Loading from "./components/Loading/Loading";
+import { Sidebar } from "./components";
 
 function App() {
   const [user, setUser] = useState<User>({
