@@ -39,7 +39,7 @@ const Login: React.FC = () => {
       toast({
         title: "Jesteś już zalogowany",
         status: "info",
-      });
+      }); 
     }
   }, []);
 
