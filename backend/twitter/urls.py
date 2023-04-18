@@ -7,6 +7,7 @@ router = routers.DefaultRouter()
 urlpatterns = [
     path('login/', views.LoginView.as_view()),
     path('logout/', views.LogoutView.as_view()),
+    path('my-informations/', views.MyInformationsView.as_view()),
     path('profile/<str:username>/', views.UserProfileView.as_view()),
     path('profile/<str:username>/followers/', views.UserFollowersView.as_view()),
     path('profile/<str:username>/following/', views.UserFollowingView.as_view()),

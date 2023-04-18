@@ -1,0 +1,220 @@
+.login-container {
+  min-height: 100vh;
+  position: relative;
+  background-color: rgb(14, 14, 14);
+
+  .login-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    height: 600px;
+    border-radius: 10px;
+    background-color: white;
+
+    .twitter-icon {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      padding: 10px;
+
+      svg {
+        width: 25px;
+        height: 25px;
+        color: #00acee;
+      }
+      font-size: 0.9rem;
+      p {
+        font-weight: 600;
+        color: black;
+        font-family: "Open Sans", sans-serif;
+      }
+    }
+
+    .form-side {
+      align-self: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 600px;
+      padding: 10px;
+      h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: rgb(51, 51, 51);
+        font-family: "Open Sans", sans-serif;
+        margin-bottom: 20px;
+      }
+      form {
+        .input-group {
+          margin: 10px;
+          margin-bottom: 20px;
+          position: relative;
+          width: fit-content;
+
+          p {
+            margin: 0;
+            margin-bottom: 5px;
+            color: #575757;
+            text-align: left;
+            font-family: "Open Sans", sans-serif;
+          }
+          input {
+            border-radius: 0.75rem;
+            padding: 10px;
+            font-size: 1rem;
+            width: 20vw;
+            border: 1px solid #a3a3a3;
+            transition: all 0.2s ease-in-out;
+
+            &::placeholder {
+              color: #a3a3a3;
+            }
+
+            &:focus {
+              outline: none;
+              border: 1px solid #00acee;
+            }
+          }
+
+          .show-password-button {
+            position: absolute;
+            right: 10px;
+            top: 52%;
+            background-color: transparent;
+            border: none;
+
+            svg {
+              color: grey;
+              font-size: 1.15rem;
+            }
+          }
+        }
+      }
+
+      .submit-button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 20px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        border-radius: 0.75rem;
+        border: none;
+        background-color: #00acee;
+        color: white;
+        font-family: "Open Sans", sans-serif;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+
+        &:hover {
+          background-color: #0084b4;
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+    .text-side {
+      width: 350px;
+      height: 100%;
+      background: rgb(90, 90, 255);
+      background: linear-gradient(
+        135deg,
+        rgba(90, 90, 255, 1) 31%,
+        rgba(30, 217, 255, 1) 100%
+      );
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      border-radius: 10px;
+      // when shirnk div shrink from right side
+      flex-shrink: 0;
+
+      h2 {
+        font-size: 2.5rem;
+        font-weight: bolder;
+        color: white;
+        font-family: "Open Sans", sans-serif;
+        margin-bottom: 30px;
+      }
+      p {
+        font-size: 1rem;
+        font-weight: lighter;
+        line-height: 1.5;
+        padding: 10px;
+        color: rgb(228, 228, 228);
+        font-family: "Open Sans", sans-serif;
+        margin-bottom: 30px;
+      }
+
+      .button-register {
+        background-color: rgb(27, 27, 27);
+        text-decoration: none;
+        padding: 15px;
+        width: 50%;
+        text-align: center;
+        border-radius: 2rem;
+        color: white;
+        font-size: 1rem;
+        font-family: "Open Sans", sans-serif;
+      }
+    }
+
+    .register-phone-link {
+      position: absolute;
+      bottom: 10px;
+      right: 50%;
+      transform: translateX(50%);
+      color: #00acee;
+      width: max-content;
+      text-decoration: underline;
+
+      &:hover {
+        color: #0084b4;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 950px) {
+    .login-box {
+      flex-direction: column;
+      height: auto + 100px;
+      width: 80vw;
+      .twitter-icon {
+        position: static;
+        justify-content: center;
+
+        svg {
+          height: 12vw;
+          width: 12vw;
+        }
+      }
+
+      h1 {
+        font-size: 1.5rem !important;
+      }
+
+      .form-side {
+        width: 60vw;
+        form {
+          width: 100% !important;
+
+          .input-group {
+            width: 100% !important;
+            margin: 20px 0px;
+            input {
+              width: inherit !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,51 @@
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  width: 275px;
+  height: 100vh;
+  background-color: #fff;
+  color: #1c2938;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 0 1rem;
+}
+
+.sidebar-menu {
+  flex: 1;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  // padding: 0 1rem;
+  cursor: pointer;
+}
+
+li:hover {
+  background-color: #f5f8fa;
+}
+
+span {
+  margin-left: 0.5rem;
+  // font-size: 1.2rem;
+}
+
+.fa-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 1rem;
+}
