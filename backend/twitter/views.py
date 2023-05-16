@@ -1,4 +1,4 @@
-from .serializers import UserLoginSerializer, TweetSerializer, TwitterFollowingSerializer, TwitterFollowerSerializer
+from .serializers import UserLoginSerializer, TweetSerializer, TwitterFollowingSerializer, TwitterFollowerSerializer, UserRegisterSerializer
 from .models import TwitterUser, Tweet, Relationship
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
@@ -25,7 +25,22 @@ class LoginView(generics.GenericAPIView):
             if user.is_active:
                 login(request, user)
                 return Response(status=HTTP_200_OK, data={'user': {'username': user.username, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name }, "success": True})
-        return Response(status=HTTP_401_UNAUTHORIZED, data={'success': False})
+        return Response(status=HTTP_401_UNAUTHORIZED, data={'success': False, 'error': 'Invalid credentials'})
+
+class RegisterView(generics.GenericAPIView):
+    serializer_class = UserRegisterSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            user = serializer.create(serializer.validated_data)
+        except Exception as e:
+            return Response(status=HTTP_400_BAD_REQUEST, data={'success': False, 'error': str(e)})
+        twitter_user = TwitterUser(user=user)
+        twitter_user.save()
+        return Response(status=HTTP_200_OK, data={'success': True})
 
 class LogoutView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)
@@ -68,7 +83,7 @@ class UserProfileView(generics.GenericAPIView):
     def get(self, request, username):
         user = get_object_or_404(User, username=username)
         twitter_user = TwitterUser.objects.get(user=user)
-        tweets = Tweet.objects.filter(user=twitter_user)
+        tweets = Tweet.objects.filter(user=twitter_user).order_by('-created_at')
         data = self.serializer_class(tweets, many=True).data
         return Response({'tweets': data, 'success': True})
 
@@ -122,4 +137,4 @@ class CreateTweetView(generics.GenericAPIView):
         tweet = Tweet(user=user, content=request.data.get('content'))
         tweet.save()
         data = self.serializer_class(tweet).data
-        return Response(data, status=HTTP_200_OK, data={'success': True})
+        return Response({'tweet': data, 'success': True}, status=HTTP_200_OK)
