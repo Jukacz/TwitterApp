@@ -7,7 +7,7 @@ import { Tweet } from "../../intefaces";
 
 const Dashboard: React.FC = () => {
   const [tweets, setTweets] = useState<Tweet[]>([]);
-  const toast = useToast({ duration: 3000, isClosable: true });
+  const toast = useToast();
   const [loading, setLoading] = useState<boolean>(false);
 
   const getAllPosts = async () => {

@@ -20,7 +20,7 @@ const Login: React.FC = () => {
 
   const [isPhone] = useMediaQuery("(min-width: 951px)");
 
-  const toast = useToast({ isClosable: true });
+  const toast = useToast();
 
   const navigateTo = useNavigate();
 

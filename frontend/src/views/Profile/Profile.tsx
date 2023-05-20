@@ -15,7 +15,7 @@ const Profile: React.FC = () => {
   const context = useContext(UserContext);
 
   const isThisMyProfile = context?.user.username === name;
-  const toast = useToast({ duration: 3000, isClosable: true });
+  const toast = useToast();
 
   useEffect(() => {
     document.title = `Twitter | Profil ${name}`;

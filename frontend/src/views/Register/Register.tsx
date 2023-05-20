@@ -22,7 +22,7 @@ const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const toast = useToast({ isClosable: true });
+  const toast = useToast();
 
   const navigateTo = useNavigate();
 
