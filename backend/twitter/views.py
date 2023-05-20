@@ -83,9 +83,14 @@ class UserProfileView(generics.GenericAPIView):
     def get(self, request, username):
         user = get_object_or_404(User, username=username)
         twitter_user = TwitterUser.objects.get(user=user)
+        user_from_query = TwitterUser.objects.get(user=request.user)
+        personal_informations = User.objects.get(username=username)
         tweets = Tweet.objects.filter(user=twitter_user).order_by('-created_at')
+        count_followers = Relationship.objects.filter(following=twitter_user).count()
+        count_following = Relationship.objects.filter(follower=twitter_user).count()
+        are_you_follow_him = Relationship.objects.filter(follower=user_from_query, following=twitter_user).exists()
         data = self.serializer_class(tweets, many=True).data
-        return Response({'tweets': data, 'success': True})
+        return Response({"profile": {'tweets': data, "count_following": count_following, "count_followers": count_followers,"following_already": are_you_follow_him,"first_name": personal_informations.first_name, "last_name": personal_informations.last_name}, 'success': True})
 
 class UserFollowersView(generics.GenericAPIView):
     serializer_class = TwitterFollowerSerializer
@@ -96,7 +101,8 @@ class UserFollowersView(generics.GenericAPIView):
         twitter_user = TwitterUser.objects.get(user=user)
         followers = Relationship.objects.filter(following=twitter_user)
         data = self.serializer_class(followers, many=True).data
-        return Response({'followers': data, "success": True}, status=HTTP_200_OK)
+        count_followers = len(data)
+        return Response({'followers': data, "followers_count": count_followers, "success": True}, status=HTTP_200_OK)
 
 class UserFollowingView(generics.GenericAPIView):
     serializer_class = TwitterFollowingSerializer
@@ -107,7 +113,8 @@ class UserFollowingView(generics.GenericAPIView):
         twitter_user = TwitterUser.objects.get(user=user)
         following = Relationship.objects.filter(follower=twitter_user)
         data = self.serializer_class(following, many=True).data
-        return Response({'following': data, "success": True}, status=HTTP_200_OK)
+        count_following = len(data)
+        return Response({'following': data, "following_count": count_following, "success": True}, status=HTTP_200_OK)
 
 class CreateRelationshipView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)

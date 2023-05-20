@@ -17,9 +17,12 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user
 
 class TweetSerializer(serializers.ModelSerializer):
+    # get all info from user
+    username = serializers.CharField(source='user.user.username')
+    first_name = serializers.CharField(source="user.user.first_name")
     class Meta:
         model = Tweet
-        fields = ('content',)
+        fields = ('id','content','username',"first_name", 'created_at')
 
 class TwitterFollowingSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='following.user.username')

@@ -10,6 +10,7 @@ import Joi from "joi";
 import { JoiInput } from "../../components";
 import UserContext from "../../contexts/user.context";
 import { useNavigate } from "react-router-dom";
+import requestToApi from "../../components/axios";
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState<string>("");
@@ -77,16 +78,34 @@ const Register: React.FC = () => {
       password,
       repeatPassword,
       email,
-      firstName,
-      lastName,
+      firstName: firstName,
+      lastName: lastName,
     });
     if (checkSchema.error) {
+      console.log(checkSchema);
       toast({
         title: "Nie udało sie dodać konta",
         description: checkSchema.error.message,
         status: "error",
       });
       return;
+    }
+    const register_response = await requestToApi
+      .post("/register/", {
+        username: username,
+        password: password,
+        email: email,
+        first_name: firstName,
+        last_name: lastName,
+      })
+      .catch((err) => err.response);
+
+    if (register_response.data.success) {
+      toast({
+        title: "Konto zostało utworzone",
+        status: "success",
+      });
+      navigateTo("/login");
     }
   };
 
@@ -133,7 +152,7 @@ const Register: React.FC = () => {
                   schema={schemas.firstName}
                   type="text"
                   placeholder="Twoja nazwa użytkownika"
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => setFirstName(e.target.value)}
                 />
               </div>
             </motion.div>
@@ -149,7 +168,7 @@ const Register: React.FC = () => {
                   schema={schemas.lastName}
                   type="text"
                   placeholder="Twoja nazwa użytkownika"
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => setLastName(e.target.value)}
                 />
               </div>
             </motion.div>
