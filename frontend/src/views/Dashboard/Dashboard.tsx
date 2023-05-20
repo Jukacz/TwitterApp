@@ -53,19 +53,21 @@ const Dashboard: React.FC = () => {
           avatarUrl="https://media.gettyimages.com/id/1322571825/photo/robert-lewandowski-of-poland-poses-during-the-official-uefa-euro-2020-media-access-day-on.jpg?s=612x612&w=gi&k=20&c=uQjS0WUHg9EY-t3ghuvm_n_oJUiyDFPaE6IBC1IRRvo="
         />
         <Skeleton isLoaded={!loading}>
-          {tweets.map((tweet, index) => (
-            <Post
-              key={index}
-              className="post"
-              tweet_id={tweet.id}
-              content={tweet.content}
-              created_at={tweet.created_at}
-              author={{
-                first_name: tweet.first_name,
-                username: tweet.username,
-              }}
-            />
-          ))}
+          <div className="tweets">
+            <h2>Najnowsze Posty</h2>
+            {tweets.map((tweet, index) => (
+              <Post
+                key={index}
+                tweet_id={tweet.id}
+                content={tweet.content}
+                created_at={tweet.created_at}
+                author={{
+                  first_name: tweet.first_name,
+                  username: tweet.username,
+                }}
+              />
+            ))}
+          </div>
         </Skeleton>
       </div>
     </div>

@@ -18,6 +18,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import requestToApi from "../axios";
+import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 
 const Sidebar: React.FC = () => {
   const context = useContext(UserContext)!;
@@ -61,7 +62,7 @@ const Sidebar: React.FC = () => {
   return (
     <div className="sidebar-container">
       <div className="sidebar-header">
-        <h1>Logo</h1>
+        <FontAwesomeIcon icon={faTwitter} className="twitter-icon" />
       </div>
       <div className="sidebar-menu">
         <ul>

@@ -10,6 +10,7 @@ export interface ProfileInterface {
   tweets: Tweet[];
   count_followers: number;
   count_following: number;
+  following_already: boolean;
   first_name: string;
   last_name: string;
 }

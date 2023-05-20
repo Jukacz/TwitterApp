@@ -90,7 +90,7 @@ class UserProfileView(generics.GenericAPIView):
         count_following = Relationship.objects.filter(follower=twitter_user).count()
         are_you_follow_him = Relationship.objects.filter(follower=user_from_query, following=twitter_user).exists()
         data = self.serializer_class(tweets, many=True).data
-        return Response({"profile": {'tweets': data, "count_following": count_following, "count_followers": count_followers,"following_already": are_you_follow_him,"first_name": personal_informations.first_name, "last_name": personal_informations.last_name}, 'success': True})
+        return Response({"profile": {'tweets': data, "count_following": count_following, "count_followers": count_followers,"following_already": are_you_follow_him,"first_name": personal_informations.first_name, "last_name": personal_informations.last_name,}, 'success': True})
 
 class UserFollowersView(generics.GenericAPIView):
     serializer_class = TwitterFollowerSerializer

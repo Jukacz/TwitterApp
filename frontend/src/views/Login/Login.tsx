@@ -1,20 +1,14 @@
 import "./Login.scss";
-import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useMediaQuery, useToast } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
-import {
-  animationFormConfig,
-  animationLoginBoxConfig,
-  animationTextContainerConfig,
-} from "../../animationsConfig/login-animations";
-import axios from "axios";
 import UserContext from "../../contexts/user.context";
 import Cookies from "cookies-js";
 import { User } from "../../interfaces/user.interface";
+import requestToApi from "../../components/axios";
 
 const Login: React.FC = () => {
   Cookies.get("csrftoken");
@@ -24,7 +18,6 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  let [isGoingToRegister, setIsGoingToRegister] = useState<boolean>(false);
   const [isPhone] = useMediaQuery("(min-width: 951px)");
 
   const toast = useToast({ isClosable: true });
@@ -32,33 +25,24 @@ const Login: React.FC = () => {
   const navigateTo = useNavigate();
 
   useEffect(() => {
-    document.title = "Login";
-    console.log(context?.user.isLogged);
+    document.title = "Twitter | Logowanie";
     if (context?.user.isLogged) {
       navigateTo("/");
       toast({
         title: "Jesteś już zalogowany",
         status: "info",
-      }); 
+      });
     }
   }, []);
 
   const login = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    const response = await axios
-      .post(
-        "/login/",
-        {
-          username,
-          password,
-        },
-        {
-          headers: {
-            "X-CSRFToken": Cookies.get("csrftoken"),
-          },
-        }
-      )
+    const response = await requestToApi
+      .post("/login/", {
+        username,
+        password,
+      })
       .catch((err) => err.response);
 
     if (response.data.success) {
@@ -66,9 +50,9 @@ const Login: React.FC = () => {
         title: "Logowanie Udane",
         status: "success",
       });
-      navigateTo("/");
       const userFromRequest: User = response.data.user;
-      context?.setUser(userFromRequest);
+      context?.setUser({ ...userFromRequest, isLogged: true });
+      navigateTo("/");
       return;
     }
     toast({
@@ -123,20 +107,12 @@ const Login: React.FC = () => {
                 Zarejestruj się, aby móc korzystać z naszych usług, a także
                 dodawać własne ogłoszenia.
               </p>
-              <NavLink
-                className="button-register"
-                to="/register"
-                onClick={() => setIsGoingToRegister(true)}
-              >
+              <NavLink className="button-register" to="/register">
                 Zarejestru j się
               </NavLink>
             </div>
           ) : (
-            <NavLink
-              to="/register"
-              className="register-phone-link"
-              onClick={() => setIsGoingToRegister(true)}
-            >
+            <NavLink to="/register" className="register-phone-link">
               Nie masz konta? Zarejestruj sie!
             </NavLink>
           )}
