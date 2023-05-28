@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Tweet, TwitterUser, Relationship
+from .models import Like, Tweet, TwitterUser, Relationship, Comment
 from django.contrib.auth.models import User
 
 class UserLoginSerializer(serializers.ModelSerializer):
@@ -17,12 +17,11 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user
 
 class TweetSerializer(serializers.ModelSerializer):
-    # get all info from user
     username = serializers.CharField(source='user.user.username')
-    first_name = serializers.CharField(source="user.user.first_name")
+  first_name = serializers.CharField(source="user.user.first_name")
     class Meta:
         model = Tweet
-        fields = ('id','content','username',"first_name", 'created_at')
+        fields = ('content', 'uuid', 'created_at', 'updated_at', 'username','first_name',  'like_count', 'comment_count')
 
 class TwitterFollowingSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='following.user.username')
@@ -35,3 +34,31 @@ class TwitterFollowerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Relationship
         fields = ('username',)
+
+class RelationshipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Relationship
+        fields = ('follower', 'following')
+
+class TweetDeleteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tweet
+        fields = ('uuid',)
+
+class CreateCommentSerializer(serializers.ModelSerializer):
+    uuid = serializers.UUIDField(source='tweet.uuid')
+    class Meta:
+        model = Comment
+        fields = ('content', 'uuid')
+
+class CommentSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.user.username')
+    class Meta:
+        model = Comment
+        fields = ('content', 'uuid', 'created_at', 'updated_at', 'username')
+
+class LikeSerializer(serializers.ModelSerializer):
+    uuid = serializers.UUIDField(source='tweet.uuid')
+    class Meta:
+        model = Like
+        fields = ('uuid',)

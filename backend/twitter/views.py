@@ -1,5 +1,5 @@
-from .serializers import UserLoginSerializer, TweetSerializer, TwitterFollowingSerializer, TwitterFollowerSerializer, UserRegisterSerializer
-from .models import TwitterUser, Tweet, Relationship
+from .serializers import UserLoginSerializer, TweetSerializer, LikeSerializer, CommentSerializer, TwitterFollowingSerializer, CreateCommentSerializer, TweetDeleteSerializer, RelationshipSerializer, TwitterFollowerSerializer, UserRegisterSerializer
+from .models import Comment, Like, TwitterUser, Tweet, Relationship
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
@@ -72,7 +72,7 @@ class FollowingView(generics.GenericAPIView):
         following = Relationship.objects.filter(follower=twitter_user)
         tweets = Tweet.objects.none()
         for f in following:
-            tweets |= Tweet.objects.filter(user=f.following)
+            tweets |= Tweet.objects.filter(user=f.following, is_deleted=False).order_by('-created_at')
         data = self.serializer_class(tweets, many=True).data
         return Response({'tweets': data, 'success': True})
 
@@ -85,7 +85,7 @@ class UserProfileView(generics.GenericAPIView):
         twitter_user = TwitterUser.objects.get(user=user)
         user_from_query = TwitterUser.objects.get(user=request.user)
         personal_informations = User.objects.get(username=username)
-        tweets = Tweet.objects.filter(user=twitter_user).order_by('-created_at')
+        tweets = Tweet.objects.filter(user=twitter_user, is_deleted=False).order_by('-created_at')
         count_followers = Relationship.objects.filter(following=twitter_user).count()
         count_following = Relationship.objects.filter(follower=twitter_user).count()
         are_you_follow_him = Relationship.objects.filter(follower=user_from_query, following=twitter_user).exists()
@@ -118,22 +118,29 @@ class UserFollowingView(generics.GenericAPIView):
 
 class CreateRelationshipView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)
+    serializer_class = RelationshipSerializer
 
     def post(self, request):
-        user = get_object_or_404(User, id=request.data.get('user_id'))
-        twitter_user = TwitterUser.objects.get(user=user)
         follower = TwitterUser.objects.get(user=request.user)
-        relationship = Relationship(follower=follower, following=twitter_user)
-        relationship.save()
+        following = get_object_or_404(TwitterUser, user__id=request.data.get('follower'))
+        if Relationship.objects.filter(follower=follower, following=following).exists():
+            return Response(status=HTTP_400_BAD_REQUEST, data={'success': False, 'error': 'Already following'})
+        
+        serializer = self.serializer_class(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        except Exception as e:
+            return Response(status=HTTP_400_BAD_REQUEST, data={'success': False, 'error': str(e)})
         return Response(status=HTTP_200_OK, data={'success': True})
-    
+
     def delete(self, request):
-        user = get_object_or_404(User, id=request.data.get('user_id'))
-        twitter_user = TwitterUser.objects.get(user=user)
         follower = TwitterUser.objects.get(user=request.user)
-        relationship = Relationship.objects.get(follower=follower, following=twitter_user)
+        following = get_object_or_404(TwitterUser, user__id=request.data.get('follower'))
+        relationship = get_object_or_404(Relationship, follower=follower, following=following)
         relationship.delete()
-        return Response(status=HTTP_200_OK, data={'success': True})
+        return Response(status=HTTP_200_OK, data={'success': True})        
+
 
 class CreateTweetView(generics.GenericAPIView):
     serializer_class = TweetSerializer
@@ -145,3 +152,72 @@ class CreateTweetView(generics.GenericAPIView):
         tweet.save()
         data = self.serializer_class(tweet).data
         return Response({'tweet': data, 'success': True}, status=HTTP_200_OK)
+    
+class DeleteTweetView(generics.GenericAPIView):
+    serializer_class = TweetDeleteSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        tweet = get_object_or_404(Tweet, uuid=request.data.get('uuid'))
+        tweet.is_deleted = True
+        tweet.save()
+        return Response(status=HTTP_200_OK, data={'success': True})
+
+class TweetView(generics.GenericAPIView):
+    serializer_class = TweetSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, uuid):
+        tweet = get_object_or_404(Tweet, uuid=uuid)
+        comments = Comment.objects.filter(tweet=tweet, is_deleted=False).order_by('-created_at')
+        comments = [{'username': c.user.user.username, 'content': c.content, 'created_at': c.created_at} for c in comments]
+        data = self.serializer_class(tweet).data
+        return Response(status=HTTP_200_OK, data={'tweet': data, 'comments': comments, 'success': True})
+
+class CommentView(generics.GenericAPIView):
+    serializer_class = CreateCommentSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        tweet = get_object_or_404(Tweet, uuid=request.data.get('uuid'))
+        user = TwitterUser.objects.get(user=request.user)
+        comment = Comment(user=user, tweet=tweet, content=request.data.get('content'))
+        comment.save()
+        tweet.comment_count += 1
+        tweet.save()
+        data = CommentSerializer(comment).data
+        return Response(status=HTTP_200_OK, data={'comment': data, 'success': True})
+    
+    def delete(self, request):
+        tweet = get_object_or_404(Tweet, uuid=request.data.get('uuid'))
+        user = TwitterUser.objects.get(user=request.user)
+        comment = get_object_or_404(Comment, tweet=tweet, user=user)
+        comment.is_deleted = True
+        comment.save()
+        tweet.comment_count -= 1
+        tweet.save()
+        return Response(status=HTTP_200_OK, data={'success': True})
+
+class LikeView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = LikeSerializer
+
+    def post(self, request):
+        tweet = get_object_or_404(Tweet, uuid=request.data.get('uuid'))
+        user = TwitterUser.objects.get(user=request.user)
+        if Like.objects.filter(tweet=tweet, user=user).exists():
+            return Response(status=HTTP_400_BAD_REQUEST, data={'success': False, 'error': 'Already liked'})
+        like = Like(tweet=tweet, user=user)
+        like.save()
+        tweet.like_count += 1
+        tweet.save()
+        return Response(status=HTTP_200_OK, data={'success': True})
+
+    def delete(self, request):
+        tweet = get_object_or_404(Tweet, uuid=request.data.get('uuid'))
+        user = TwitterUser.objects.get(user=request.user)
+        like = get_object_or_404(Like, tweet=tweet, user=user)
+        like.delete()
+        tweet.like_count -= 1
+        tweet.save()
+        return Response(status=HTTP_200_OK, data={'success': True})
