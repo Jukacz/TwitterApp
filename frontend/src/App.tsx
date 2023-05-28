@@ -54,9 +54,9 @@ function App() {
       <LoadingContext.Provider value={loading}>
         <Loading>
           <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
+            <Routes location={location}>
               <Route path="/" element={<VerifyProfile />}>
-                <Route path="" element={<Dashboard />} />
+                <Route index element={<Dashboard />} />
                 <Route path="followers" element={<h1>followers</h1>} />
                 <Route path="likes" element={<h1>likes</h1>} />
                 <Route path="hashtags" element={<h1>hashtags</h1>} />

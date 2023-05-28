@@ -42,7 +42,7 @@ const Profile: React.FC = () => {
     };
 
     init();
-  }, []);
+  }, [name]);
 
   useEffect(() => {
     console.log(profile);

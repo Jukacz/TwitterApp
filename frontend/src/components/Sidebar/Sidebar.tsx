@@ -1,5 +1,5 @@
 import "./Sidebar.scss";
-import React, { useContext, useEffect } from "react";
+import React, { memo, useContext, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBell,
@@ -30,6 +30,10 @@ const Sidebar: React.FC = () => {
     duration: 3000,
     isClosable: true,
   });
+
+  useEffect(() => {
+    console.log("fajnie");
+  }, []);
 
   const logout = async () => {
     const logout_response = await requestToApi
@@ -100,4 +104,4 @@ const Sidebar: React.FC = () => {
   );
 };
 
-export default Sidebar;
+export default memo(Sidebar);
