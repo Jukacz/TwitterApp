@@ -15,4 +15,8 @@ urlpatterns = [
     path('home/following/', views.FollowingView.as_view()),
     path('relationship/', views.CreateRelationshipView.as_view()),
     path('create-tweet/', views.CreateTweetView.as_view()),
+    path('delete-tweet/', views.DeleteTweetView.as_view()),
+    path('tweet/<uuid:uuid>/', views.TweetView.as_view()),
+    path('comment/<uuid:uuid>/', views.CommentView.as_view()),
+    path('like/', views.LikeView.as_view()),
 ]

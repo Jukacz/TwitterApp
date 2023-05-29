@@ -61,3 +61,4 @@ backend/cheat_sheets
 
 /frontend/node_modules
 backend/db.sqlite3
+venv/

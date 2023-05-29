@@ -10,7 +10,9 @@ const TweetForm: React.FC<TweetFormProps> = ({ onTweetSubmit, avatarUrl }) => {
   const [tweetText, setTweetText] = useState("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTweetText(e.target.value);
+    const value = e.target.value;
+    if (value.length > 280) return;
+    setTweetText(value);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

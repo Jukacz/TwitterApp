@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import "./RightSidebar.scss";
+import { useNavigate } from "react-router-dom";
 
-interface RightSidebarProps {
-  hashtags: string[];
-  nonFollowedUsers: string[];
-}
-
-const RightSidebar: React.FC<RightSidebarProps> = ({
-  hashtags,
-  nonFollowedUsers,
-}) => {
+const RightSidebar: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
+
+  const hashtags = ["react", "typescript", "javascript"];
+  const nonFollowedUsers = [
+    "ogrodas",
+    "pingwinek2115",
+    "frontendnawypasie.com",
+    "reactjs",
+  ];
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
@@ -37,7 +39,11 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       <div className="hashtags-container">
         <h2>Popular hashtags</h2>
         {filteredHashtags.map((hashtag, index) => (
-          <div key={index} className="hashtag">
+          <div
+            key={index}
+            onClick={() => navigate(`/hashtag/${hashtag}`)}
+            className="hashtag"
+          >
             #{hashtag}
           </div>
         ))}
@@ -45,8 +51,12 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
       <div className="users-container">
         <h2>Users you don't follow</h2>
         {filteredUsers.map((user, index) => (
-          <div key={index} className="user">
-            {user}
+          <div
+            key={index}
+            onClick={() => navigate(`/${user}`)}
+            className="user"
+          >
+            @{user}
           </div>
         ))}
       </div>

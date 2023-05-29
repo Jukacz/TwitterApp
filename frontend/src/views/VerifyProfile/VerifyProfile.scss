@@ -1,0 +1,14 @@
+.verify-profile-container {
+  min-height: 100vh;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+
+  .outlet {
+    border: 1px solid #e6ecf0;
+    width: 600px;
+  }
+}

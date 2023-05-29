@@ -1,15 +1,14 @@
-import "./App.css";
 import React, { useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Dashboard, Login, Register } from "./views";
 import { User } from "./interfaces/user.interface";
 import { AnimatePresence } from "framer-motion";
-import { ChakraProvider } from "@chakra-ui/react";
 import UserContext from "./contexts/user.context";
 import axios from "axios";
 import LoadingContext from "./contexts/loading.context";
 import Loading from "./components/Loading/Loading";
-import { Sidebar } from "./components";
+import VerifyProfile from "./views/VerifyProfile/VerifyProfile";
+import Profile from "./views/Profile/Profile";
 
 function App() {
   const [user, setUser] = useState<User>({
@@ -46,34 +45,34 @@ function App() {
   }, [user]);
 
   return (
-    <div className="App">
-      <ChakraProvider>
-        <UserContext.Provider
-          value={{
-            user,
-            setUser,
-          }}
-        >
-          <LoadingContext.Provider value={loading}>
-            <Loading>
-              <AnimatePresence mode="wait">
-                <Routes location={location} key={location.pathname}>
-                  <Route path="/" element={<Dashboard />}>
-                    <Route path="" element={<h1>Dashboard</h1>} />
-                    <Route path="followers" element={<h1>followers</h1>} />
-                    <Route path="hashtags" element={<h1>hashtags</h1>} />
-                    <Route path="likes" element={<h1>likes</h1>} />
-                    <Route path="/:name" element={<h1>Profile</h1>} />
-                  </Route>
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                </Routes>
-              </AnimatePresence>
-            </Loading>
-          </LoadingContext.Provider>
-        </UserContext.Provider>
-      </ChakraProvider>
-    </div>
+    <UserContext.Provider
+      value={{
+        user,
+        setUser,
+      }}
+    >
+      <LoadingContext.Provider value={loading}>
+        <Loading>
+          <AnimatePresence mode="wait">
+            <Routes location={location}>
+              <Route path="/" element={<VerifyProfile />}>
+                <Route index element={<Dashboard />} />
+                <Route path="followers" element={<h1>followers</h1>} />
+                <Route path="likes" element={<h1>likes</h1>} />
+                <Route path="hashtags" element={<h1>hashtags</h1>} />
+                <Route
+                  path="/hashtag/:name"
+                  element={<h1>Jakiś wyvrany hasztag</h1>}
+                />
+                <Route path="/:name" element={<Profile />} />
+              </Route>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+            </Routes>
+          </AnimatePresence>
+        </Loading>
+      </LoadingContext.Provider>
+    </UserContext.Provider>
   );
 }
 
