@@ -13,7 +13,7 @@ class Tweet(models.Model):
     content = models.CharField(max_length=140)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    uuid = models.UUIDField(default=uuid4, editable=False)
+    uuid = models.UUIDField(default=uuid4, editable=False, unique=True)
     is_deleted = models.BooleanField(default=False)
     like_count = models.IntegerField(default=0)
     comment_count = models.IntegerField(default=0)

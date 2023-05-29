@@ -15,3 +15,10 @@ export interface PostProps extends HTMLAttributes<HTMLDivElement> {
   comment_numnber: number;
   updated_at: string;
 }
+
+export interface TweetComment {
+  username: string;
+  first_name: string;
+  content: string;
+  created_at: string;
+}

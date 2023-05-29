@@ -26,6 +26,7 @@ const Sidebar: React.FC = () => {
   const myfirstname = context.user.first_name;
 
   const navigate = useNavigate();
+
   const toast = useToast({
     duration: 3000,
     isClosable: true,
@@ -93,8 +94,8 @@ const Sidebar: React.FC = () => {
             </div>
           </MenuButton>
           <MenuList>
-            <MenuItem>
-              <NavLink to={`/${myUsermame}`}>Mój profil</NavLink>
+            <MenuItem onClick={() => navigate(`/${myUsermame}`)}>
+              Mój profil
             </MenuItem>
             <MenuItem onClick={() => logout()}>Wyloguj sie</MenuItem>
           </MenuList>
