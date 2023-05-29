@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
-import { Dashboard, Login, Register } from "./views";
+import { Dashboard, Login, Register, Hashtag } from "./views";
 import { User } from "./interfaces/user.interface";
 import { AnimatePresence } from "framer-motion";
 import UserContext from "./contexts/user.context";
@@ -60,10 +60,7 @@ function App() {
                 <Route path="followers" element={<h1>followers</h1>} />
                 <Route path="likes" element={<h1>likes</h1>} />
                 <Route path="hashtags" element={<h1>hashtags</h1>} />
-                <Route
-                  path="/hashtag/:name"
-                  element={<h1>Jakiś wyvrany hasztag</h1>}
-                />
+                <Route path="/hashtag/:name" element={<Hashtag />} />
                 <Route path="/:name" element={<Profile />} />
               </Route>
               <Route path="/login" element={<Login />} />
