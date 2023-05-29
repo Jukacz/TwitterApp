@@ -1,3 +1,5 @@
+@import "../../colors";
+
 .post {
   margin: auto;
   width: 90%;
@@ -25,7 +27,79 @@
       }
     }
   }
+  .post-footer {
+    .footer-buttons-section {
+      gap: 20px;
+      display: flex;
+      color: #657786;
+      .button-post {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+      }
+      .post-likes {
+        width: fit-content;
+        transition: all 0.2s ease-in-out;
+        &:hover {
+          color: $lightRed;
+        }
+      }
+      .licked-already {
+        color: $lightRed;
+      }
+      .open-comment-section-button {
+        transition: all 0.2s ease-in-out;
+        &:hover {
+          color: $lightRed;
+        }
+      }
+    }
 
+    .comment-section-container {
+      margin-top: 20px;
+      .add-my-comment-section {
+        display: flex;
+        align-items: center;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #969696;
+        img {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          margin-right: 16px;
+        }
+
+        input {
+          width: 100%;
+          border: none;
+          outline: none;
+          font-size: 16px;
+          line-height: 24px;
+          color: #14171a;
+          padding: 16px 0;
+
+          &::placeholder {
+            color: #657786;
+          }
+        }
+
+        button {
+          display: flex;
+          gap: 5px;
+          align-items: center;
+          margin-left: auto;
+          background-color: transparent;
+          border: none;
+          outline: none;
+          color: #00acee;
+          font-size: 16px;
+          line-height: 24px;
+          font-weight: bold;
+          cursor: pointer;
+        }
+      }
+    }
+  }
   .post-header img {
     width: 48px;
     height: 48px;
@@ -64,12 +138,5 @@
     font-size: 16px;
     line-height: 24px;
     margin: 16px 0;
-  }
-
-  .post-footer {
-    display: flex;
-    justify-content: flex-end;
-    font-size: 14px;
-    color: #657786;
   }
 }

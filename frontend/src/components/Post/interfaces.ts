@@ -7,8 +7,11 @@ interface Author {
 
 export interface PostProps extends HTMLAttributes<HTMLDivElement> {
   tweet_id: number;
+  tweet_uuid: string;
   content: string;
   created_at: string;
   author: Author;
-  likes?: number;
+  likes_number: number;
+  comment_numnber: number;
+  updated_at: string;
 }

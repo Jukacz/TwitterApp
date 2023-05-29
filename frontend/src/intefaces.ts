@@ -1,9 +1,13 @@
 export interface Tweet {
   id: number;
+  uuid: string;
   content: string;
   username: string;
   first_name: string;
   created_at: string;
+  like_count: number;
+  comment_count: number;
+  updated_at: string;
 }
 
 export interface ProfileInterface {

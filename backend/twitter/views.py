@@ -188,6 +188,12 @@ class CommentView(generics.GenericAPIView):
         data = CommentSerializer(comment).data
         return Response(status=HTTP_200_OK, data={'comment': data, 'success': True})
     
+    def get(self, request, uuid):
+        tweet = get_object_or_404(Tweet, uuid=uuid)
+        comments = Comment.objects.filter(tweet=tweet, is_deleted=False).order_by('-created_at')
+        comments = [{'username': c.user.user.username, 'first_name': c.user.user.first_name, 'content': c.content, 'created_at': c.created_at} for c in comments]
+        return Response(status=HTTP_200_OK, data={'comments': comments, 'success': True})
+    
     def delete(self, request):
         tweet = get_object_or_404(Tweet, uuid=request.data.get('uuid'))
         user = TwitterUser.objects.get(user=request.user)

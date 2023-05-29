@@ -115,12 +115,16 @@ const Profile: React.FC = () => {
               <Post
                 key={index}
                 tweet_id={tweet.id}
+                tweet_uuid={tweet.uuid}
                 content={tweet.content}
                 created_at={tweet.created_at}
                 author={{
                   first_name: tweet.first_name,
                   username: tweet.username,
                 }}
+                comment_numnber={tweet.comment_count}
+                likes_number={tweet.like_count}
+                updated_at={tweet.updated_at}
               />
             );
           })}
