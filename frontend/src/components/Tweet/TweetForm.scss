@@ -1,3 +1,5 @@
+/* Mobile-first Styles */
+
 .tweet-form {
   display: flex;
   flex-direction: column;
@@ -65,4 +67,45 @@
 
 .character-count {
   color: #9a9a9a;
+}
+
+/* Responsive Styles */
+
+@media screen and (min-width: 600px) {
+  .tweet-form {
+    flex-direction: row;
+  }
+
+  .avatar-container {
+    width: 70px;
+    height: 70px;
+    margin-right: 15px;
+  }
+
+  .tweet-input {
+    height: 150px;
+  }
+
+  .tweet-button {
+    font-size: 20px;
+    padding: 12px 24px;
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .avatar-container {
+    width: 80px;
+    height: 80px;
+    margin-right: 20px;
+  }
+
+  .tweet-input {
+    font-size: 20px;
+    height: 200px;
+  }
+
+  .tweet-button {
+    font-size: 22px;
+    padding: 14px 28px;
+  }
 }
