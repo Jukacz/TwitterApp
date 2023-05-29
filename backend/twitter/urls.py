@@ -13,6 +13,7 @@ urlpatterns = [
     path('profile/<str:username>/followers/', views.UserFollowersView.as_view()),
     path('profile/<str:username>/following/', views.UserFollowingView.as_view()),
     path('home/following/', views.FollowingView.as_view()),
+    path('home/tweets/', views.TweetsView.as_view()),
     path('relationship/', views.CreateRelationshipView.as_view()),
     path('create-tweet/', views.CreateTweetView.as_view()),
     path('delete-tweet/', views.DeleteTweetView.as_view()),

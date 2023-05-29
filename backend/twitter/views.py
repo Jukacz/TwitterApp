@@ -75,6 +75,16 @@ class FollowingView(generics.GenericAPIView):
             tweets |= Tweet.objects.filter(user=f.following, is_deleted=False).order_by('-created_at')
         data = self.serializer_class(tweets, many=True).data
         return Response({'tweets': data, 'success': True})
+    
+class TweetsView(generics.GenericAPIView):
+    serializer_class = TweetSerializer
+    permission_classes = (IsAuthenticated,)
+    # get all tweets
+    def get(self, request):
+        tweets = Tweet.objects.filter(is_deleted=False).order_by('-created_at')
+        data = self.serializer_class(tweets, many=True).data
+        return Response({'tweets': data, 'success': True})
+
 
 class UserProfileView(generics.GenericAPIView):
     serializer_class = TweetSerializer
