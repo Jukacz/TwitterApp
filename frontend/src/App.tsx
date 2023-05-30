@@ -57,10 +57,7 @@ function App() {
             <Routes location={location}>
               <Route path="/" element={<VerifyProfile />}>
                 <Route index element={<Dashboard />} />
-                <Route path="followers" element={<h1>followers</h1>} />
-                <Route path="likes" element={<h1>likes</h1>} />
-                <Route path="hashtags" element={<h1>hashtags</h1>} />
-                <Route path="/hashtag/:name" element={<Hashtag />} />
+                <Route path="hashtag/:name" element={<Hashtag />} />
                 <Route path="/:name" element={<Profile />} />
               </Route>
               <Route path="/login" element={<Login />} />

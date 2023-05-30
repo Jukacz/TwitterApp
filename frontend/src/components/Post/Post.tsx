@@ -139,11 +139,12 @@ const Post: React.FC<PostProps> = (props) => {
         </div>
         <div className="post-content">
           {content.split(" ").map((word, index) => {
+            console.log(word.trim());
             if (word.startsWith("#")) {
               return (
                 <NavLink
                   className="hashtag"
-                  to={`/hashtag/${word}`}
+                  to={`/hashtag/${word.substring(1)}`}
                   key={index}
                 >
                   {word}{" "}

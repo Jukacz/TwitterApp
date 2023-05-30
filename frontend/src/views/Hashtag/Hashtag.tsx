@@ -4,11 +4,12 @@ import { Post, TweetForm } from "../../components";
 import requestToApi from "../../components/axios";
 import { Skeleton, useToast } from "@chakra-ui/react";
 import { Tweet } from "../../intefaces";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Hashtag: React.FC = () => {
   const [tweets, setTweets] = useState<Tweet[]>([]);
   const toast = useToast();
+  const navigate = useNavigate();
   const { name } = useParams();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -24,22 +25,23 @@ const Hashtag: React.FC = () => {
       return;
     }
     toast({
-      title: "Nie udało sie pobrać tweetów",
+      title: "Nie ma takiego hasztagu",
       description: "Spróbuj ponownie później",
     });
+    navigate("/");
   };
 
   useEffect(() => {
-    document.title = "Twitter | Strona Główna";
+    document.title = `Twitter | Hashtag ${name} `;
     getAllPosts();
-  }, []);
+  }, [name]);
 
   return (
     <div className="dashboard-container">
       <div>
         <Skeleton isLoaded={!loading}>
           <div className="tweets">
-            <h2>Najnowsze Posty</h2>
+            <h2>Tweety z hasztagiem {name}</h2>
             {tweets.map((tweet, index) => (
               <Post
                 key={index}
