@@ -1,19 +1,21 @@
-import "./Dashboard.scss";
+import "./Hashtag.scss";
 import React, { useEffect, useState } from "react";
 import { Post, TweetForm } from "../../components";
 import requestToApi from "../../components/axios";
 import { Skeleton, useToast } from "@chakra-ui/react";
 import { Tweet } from "../../intefaces";
+import { useParams } from "react-router-dom";
 
-const Dashboard: React.FC = () => {
+const Hashtag: React.FC = () => {
   const [tweets, setTweets] = useState<Tweet[]>([]);
   const toast = useToast();
+  const { name } = useParams();
   const [loading, setLoading] = useState<boolean>(false);
 
   const getAllPosts = async () => {
     setLoading(true);
     const response = await requestToApi
-      .get("/home/following/")
+      .get(`/hashtag/${name}`)
       .catch((err) => err.response);
 
     if (response.data.success) {
@@ -32,23 +34,9 @@ const Dashboard: React.FC = () => {
     getAllPosts();
   }, []);
 
-  const handleTweetSubmit = (tweetText: string) => {
-    if (tweetText.length > 1) {
-      if (tweetText.includes("#")) {
-        console.log("tweetText", tweetText);
-        return;
-      }
-      toast({
-        title: "Tweet musi zawierać co najmiej jeden hasztag",
-        status: "warning",
-      });
-    }
-  };
-
   return (
     <div className="dashboard-container">
       <div>
-        <TweetForm />
         <Skeleton isLoaded={!loading}>
           <div className="tweets">
             <h2>Najnowsze Posty</h2>
@@ -75,4 +63,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default Hashtag;
