@@ -19,4 +19,5 @@ urlpatterns = [
     path('tweet/<uuid:uuid>/', views.TweetView.as_view()),
     path('comment/<uuid:uuid>/', views.CommentView.as_view()),
     path('like/', views.LikeView.as_view()),
+    path('hashtag/<str:hashtag>/', views.HashtagView.as_view()),
 ]

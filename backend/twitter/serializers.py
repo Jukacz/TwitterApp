@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Like, Tweet, TwitterUser, Relationship, Comment
+from .models import Like, Tweet, TwitterUser, Relationship, Comment, Hashtag
 from django.contrib.auth.models import User
 
 class UserLoginSerializer(serializers.ModelSerializer):
@@ -62,3 +62,8 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = ('uuid',)
+
+class HashtagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hashtag
+        fields = ('name', 'tweet_count')

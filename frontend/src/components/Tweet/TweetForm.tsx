@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./TweetForm.scss";
+import requestToApi from "../axios";
 
 const TweetForm: React.FC = () => {
   const [tweetText, setTweetText] = useState("");
@@ -9,18 +10,16 @@ const TweetForm: React.FC = () => {
     if (value.length > 280) return;
     setTweetText(value);
   };
-
-  // const formatTweetText = (text: string) => {
-  //   const formattedText = text
-  //     .replace(/(@\S+)/g, '<span class="green-text">$1</span>')
-  //     .replace(/(#\S+)/g, '<span class="blue-text">$1</span>');
-  //   return formattedText;
-  // };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     let isHashtag = false;
     if (tweetText.trim() !== "") {
+      const response_from_creating_tweet = await requestToApi.post("/create-tweet/", {
+        content: tweetText,
+      })
+
+      console.log(response_from_creating_tweet)
+      setTweetText("");
       const array_of_hashtags = [];
       const array_of_word = tweetText.split(" ");
       for (const word of array_of_word) {

@@ -5,7 +5,7 @@ const requestToApi = axios.create({
   baseURL: "http://localhost:8000/api/",
   withCredentials: true,
   headers: {
-    "X-CSRFToken": Cookies.get("csrftoken"),
+    "X-CSRFToken": Cookies.get("csrftoken"),  
   },
 });
 
