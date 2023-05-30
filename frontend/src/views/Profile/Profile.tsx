@@ -6,6 +6,7 @@ import UserContext from "../../contexts/user.context";
 import { ProfileInterface } from "../../intefaces";
 import { Skeleton, useToast } from "@chakra-ui/react";
 import { Post } from "../../components";
+import ModalFollowers from "../../components/ModalFollowers/ModalFollowers";
 
 const Profile: React.FC = () => {
   const { name } = useParams();
@@ -48,7 +49,49 @@ const Profile: React.FC = () => {
     console.log(profile);
   }, [profile]);
 
-  const make_follow = async () => {};
+  const make_follow = async () => {
+    if (profile?.following_already) {
+      const response_from_sending_observation = await requestToApi
+        .delete(`/relationship/`, {
+          data: {
+            follower: profile.id,
+          },
+        })
+        .catch((err) => err.response);
+
+      if (!response_from_sending_observation.data.success) {
+        toast({
+          title: "Błąd",
+          description: "Podczas wysyłania obserwacji wystąpił błąd",
+          status: "error",
+        });
+        return;
+      }
+    } else {
+      const response_from_sending_observation = await requestToApi
+        .post(`/relationship/`, {
+          follower: profile!.id,
+        })
+        .catch((err) => err.response);
+
+      if (!response_from_sending_observation.data.success) {
+        toast({
+          title: "Błąd",
+          description: "Podczas wysyłania obserwacji wystąpił błąd",
+          status: "error",
+        });
+        return;
+      }
+    }
+    setProfile((state) => {
+      return {
+        ...state!,
+        following_already: !state!.following_already,
+        count_followers:
+          state!.count_followers + (state!.following_already ? -1 : 1),
+      };
+    });
+  };
   return (
     <div className="profile-container">
       <Skeleton isLoaded={!loading}>
@@ -66,7 +109,14 @@ const Profile: React.FC = () => {
               <img src="https://picsum.photos/200" alt="Profile" />
             </div>
             {!isThisMyProfile && (
-              <button onClick={() => make_follow} className="follow-button">
+              <button
+                onClick={() => make_follow()}
+                className={`follow-button ${
+                  profile?.following_already
+                    ? "folllowing_already"
+                    : "following_not_yet"
+                }`}
+              >
                 {profile?.following_already ? "Obserwujesz" : "Zaobserwuj"}
               </button>
             )}
@@ -87,20 +137,24 @@ const Profile: React.FC = () => {
           </Skeleton>
           <div className="flex-box-div">
             <Skeleton isLoaded={!loading}>
-              <div className="profile-followers">
-                <p>
-                  {profile?.count_followers}
-                  <span>Obserwujących</span>
-                </p>
-              </div>
+              <ModalFollowers username={name!} mode="followers">
+                <div className="profile-followers">
+                  <p>
+                    {profile?.count_followers}
+                    <span>Obserwujących</span>
+                  </p>
+                </div>
+              </ModalFollowers>
             </Skeleton>
             <Skeleton isLoaded={!loading}>
-              <div className="profile-following">
-                <p>
-                  {profile?.count_following}
-                  <span>Obserwuje</span>
-                </p>
-              </div>
+              <ModalFollowers username={name!} mode="following">
+                <div className="profile-following">
+                  <p>
+                    {profile?.count_following}
+                    <span>Obserwuje</span>
+                  </p>
+                </div>
+              </ModalFollowers>
             </Skeleton>
           </div>
         </div>

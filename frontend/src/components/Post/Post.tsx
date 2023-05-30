@@ -2,7 +2,7 @@ import "./Post.scss";
 import React, { useEffect, useState } from "react";
 import { PostProps, TweetComment } from "./interfaces";
 import moment from "moment";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faComment,
@@ -137,7 +137,34 @@ const Post: React.FC<PostProps> = (props) => {
             <div className="post-created-at">{calculateTime(created_at)}</div>
           </div>
         </div>
-        <div className="post-content">{content}</div>
+        <div className="post-content">
+          {content.split(" ").map((word, index) => {
+            if (word.startsWith("#")) {
+              return (
+                <NavLink
+                  className="hashtag"
+                  to={`/hashtag/${word}`}
+                  key={index}
+                >
+                  {word}{" "}
+                </NavLink>
+              );
+            }
+            if (word.startsWith("@")) {
+              return (
+                <NavLink
+                  className="hashtag"
+                  to={`/${word.substring(1)}`}
+                  key={index}
+                >
+                  {word}{" "}
+                </NavLink>
+              );
+            }
+
+            return word + " ";
+          })}
+        </div>
         <div className="post-footer">
           <div className="footer-buttons-section">
             <button

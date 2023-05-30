@@ -1,25 +1,21 @@
 import React, { useState } from "react";
 import "./TweetForm.scss";
 import requestToApi from "../axios";
+import { useToast } from "@chakra-ui/react";
 
 const TweetForm: React.FC = () => {
   const [tweetText, setTweetText] = useState("");
+  const toast = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     if (value.length > 280) return;
     setTweetText(value);
   };
-  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     let isHashtag = false;
     if (tweetText.trim() !== "") {
-      const response_from_creating_tweet = await requestToApi.post("/create-tweet/", {
-        content: tweetText,
-      })
-
-      console.log(response_from_creating_tweet)
-      setTweetText("");
       const array_of_hashtags = [];
       const array_of_word = tweetText.split(" ");
       for (const word of array_of_word) {
@@ -29,7 +25,31 @@ const TweetForm: React.FC = () => {
           console.log("isHashtag", word);
         }
       }
-      console.log("array_of_hashtags", array_of_hashtags);
+
+      if (!isHashtag) {
+        toast({
+          title: "Tweet musi zawierać hashtag",
+          status: "warning",
+        });
+        return;
+      }
+      const response_from_creating_tweet = await requestToApi
+        .post("/create-tweet/", {
+          content: tweetText,
+        })
+        .catch((err) => err.response);
+
+      if (response_from_creating_tweet.data.success) {
+        toast({
+          title: "Tweet został utworzony",
+          status: "success",
+        });
+        return;
+      }
+      toast({
+        title: "Tweet nie został utworzony",
+        status: "error",
+      });
     }
   };
 

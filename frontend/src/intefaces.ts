@@ -11,6 +11,7 @@ export interface Tweet {
 }
 
 export interface ProfileInterface {
+  id: number;
   tweets: Tweet[];
   count_followers: number;
   count_following: number;

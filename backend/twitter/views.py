@@ -82,12 +82,16 @@ class FollowingView(generics.GenericAPIView):
 class TweetsView(generics.GenericAPIView):
     serializer_class = TweetSerializer
     permission_classes = (IsAuthenticated,)
-    # get all tweets
     def get(self, request):
-        tweets = Tweet.objects.filter(is_deleted=False).order_by('-created_at')
+    # get all tweets from all users that i dont follow
+        user = request.user
+        twitter_user = TwitterUser.objects.get(user=user)
+        following = Relationship.objects.filter(follower=twitter_user)
+        tweets = Tweet.objects.exclude(user__in=following.values_list('following', flat=True)).exclude(user=twitter_user, is_deleted=False).order_by('-created_at')
         data = self.serializer_class(tweets, many=True).data
+        for tweet in data:
+            tweet['already_liked'] = Like.objects.filter(user=twitter_user, tweet__uuid=tweet['uuid']).exists()
         return Response({'tweets': data, 'success': True})
-
 
 class UserProfileView(generics.GenericAPIView):
     serializer_class = TweetSerializer
@@ -96,14 +100,17 @@ class UserProfileView(generics.GenericAPIView):
     def get(self, request, username):
         user = get_object_or_404(User, username=username)
         twitter_user = TwitterUser.objects.get(user=user)
-        user_from_query = TwitterUser.objects.get(user=request.user)
+        my_account = TwitterUser.objects.get(user=request.user)
+        print(twitter_user, my_account)
         personal_informations = User.objects.get(username=username)
+        print(personal_informations.id)
         tweets = Tweet.objects.filter(user=twitter_user, is_deleted=False).order_by('-created_at')
         count_followers = Relationship.objects.filter(following=twitter_user).count()
         count_following = Relationship.objects.filter(follower=twitter_user).count()
-        are_you_follow_him = Relationship.objects.filter(follower=user_from_query, following=twitter_user).exists()
+        are_you_follow_him = Relationship.objects.filter(follower=my_account, following=twitter_user).exists()
+        print(Relationship.objects.filter(follower=twitter_user).all())
         data = self.serializer_class(tweets, many=True).data
-        return Response({"profile": {'tweets': data, "count_following": count_following, "count_followers": count_followers,"following_already": are_you_follow_him,"first_name": personal_informations.first_name, "last_name": personal_informations.last_name}, 'success': True})
+        return Response({"profile": {'tweets': data, "count_following": count_following, "count_followers": count_followers,"following_already": are_you_follow_him,"first_name": personal_informations.first_name, "last_name": personal_informations.last_name, "id": personal_informations.id}, 'success': True})
 
 class UserFollowersView(generics.GenericAPIView):
     serializer_class = TwitterFollowerSerializer
@@ -115,7 +122,7 @@ class UserFollowersView(generics.GenericAPIView):
         followers = Relationship.objects.filter(following=twitter_user)
         data = self.serializer_class(followers, many=True).data
         count_followers = len(data)
-        return Response({'followers': data, "followers_count": count_followers, "success": True}, status=HTTP_200_OK)
+        return Response({'users': data, "followers_count": count_followers, "success": True}, status=HTTP_200_OK)
 
 class UserFollowingView(generics.GenericAPIView):
     serializer_class = TwitterFollowingSerializer
@@ -127,7 +134,7 @@ class UserFollowingView(generics.GenericAPIView):
         following = Relationship.objects.filter(follower=twitter_user)
         data = self.serializer_class(following, many=True).data
         count_following = len(data)
-        return Response({'following': data, "following_count": count_following, "success": True}, status=HTTP_200_OK)
+        return Response({'users': data, "following_count": count_following, "success": True}, status=HTTP_200_OK)
 
 class CreateRelationshipView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)
@@ -138,17 +145,23 @@ class CreateRelationshipView(generics.GenericAPIView):
         following = get_object_or_404(TwitterUser, user__id=request.data.get('follower'))
         if Relationship.objects.filter(follower=follower, following=following).exists():
             return Response(status=HTTP_400_BAD_REQUEST, data={'success': False, 'error': 'Already following'})
-        
+        data = request.data
+        data['follower'] = follower.id
+        data['following'] = following.id
+        print(follower)
+        print(following)
         serializer = self.serializer_class(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            print(request.data.get('follower'))
         except Exception as e:
             return Response(status=HTTP_400_BAD_REQUEST, data={'success': False, 'error': str(e)})
         return Response(status=HTTP_200_OK, data={'success': True})
 
     def delete(self, request):
         follower = TwitterUser.objects.get(user=request.user)
+        print(request.data)
         following = get_object_or_404(TwitterUser, user__id=request.data.get('follower'))
         relationship = get_object_or_404(Relationship, follower=follower, following=following)
         relationship.delete()

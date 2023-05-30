@@ -31,9 +31,10 @@ class TwitterFollowingSerializer(serializers.ModelSerializer):
 
 class TwitterFollowerSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='follower.user.username')
+    first_name = serializers.CharField(source='follower.user.first_name')
     class Meta:
         model = Relationship
-        fields = ('username',)
+        fields = ('username','first_name')
 
 class RelationshipSerializer(serializers.ModelSerializer):
     class Meta:
