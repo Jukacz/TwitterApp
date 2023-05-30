@@ -8,6 +8,7 @@ export interface Tweet {
   like_count: number;
   comment_count: number;
   updated_at: string;
+  already_liked: boolean;
 }
 
 export interface ProfileInterface {

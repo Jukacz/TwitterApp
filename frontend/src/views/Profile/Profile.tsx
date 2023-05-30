@@ -189,6 +189,7 @@ const Profile: React.FC = () => {
                     comment_numnber={tweet.comment_count}
                     likes_number={tweet.like_count}
                     updated_at={tweet.updated_at}
+                    liked={tweet.already_liked}
                   />
                 );
               })}
