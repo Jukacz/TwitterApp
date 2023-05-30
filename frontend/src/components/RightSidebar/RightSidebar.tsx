@@ -1,12 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./RightSidebar.scss";
 import { useNavigate } from "react-router-dom";
+import requestToApi from "../../components/axios";
+import axios from "axios";
+import { lastHashtagInterface } from "../../intefaces";
+import { useToast } from "@chakra-ui/react";
 
 const RightSidebar: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
+  const [lastHashtags, setlastHashtags] = useState<string[]>([]);
   const navigate = useNavigate();
+  const toast = useToast();
 
-  const hashtags = ["react", "typescript", "javascript"];
+  const getLastHashtags = async () => {
+    const response = await requestToApi
+      .get("last-hashtags/")
+      .catch((err) => err.response);
+
+    if (response.data.success) {
+      setlastHashtags(response.data.hashtags);
+      console.log("hashtags", response.data.hashtags);
+      return;
+    }
+    toast({
+      title: "Nie udało sie pobrać hashtagów",
+      description: "Spróbuj ponownie później",
+    });
+  };
+  useEffect(() => {
+    getLastHashtags();
+  }, []);
+
   const nonFollowedUsers = [
     "ogrodas",
     "pingwinek2115",
@@ -18,7 +42,7 @@ const RightSidebar: React.FC = () => {
     setSearchValue(event.target.value);
   };
 
-  const filteredHashtags = hashtags.filter((hashtag) =>
+  const filteredHashtags = lastHashtags.filter((hashtag) =>
     hashtag.toLowerCase().includes(searchValue.toLowerCase())
   );
 
@@ -38,7 +62,7 @@ const RightSidebar: React.FC = () => {
       </div>
       <div className="hashtags-container">
         <h2>Popular hashtags</h2>
-        {filteredHashtags.map((hashtag, index) => (
+        {lastHashtags.map((hashtag, index) => (
           <div
             key={index}
             onClick={() => navigate(`/hashtag/${hashtag}`)}

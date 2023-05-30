@@ -19,3 +19,9 @@ export interface ProfileInterface {
   first_name: string;
   last_name: string;
 }
+
+export interface lastHashtagInterface {
+  id: number;
+  hashtag: string;
+  count: number;
+}
