@@ -9,13 +9,13 @@ import { useParams } from "react-router-dom";
 const Hashtag: React.FC = () => {
   const [tweets, setTweets] = useState<Tweet[]>([]);
   const toast = useToast();
-  const { hashtagName } = useParams();
+  const { name } = useParams();
   const [loading, setLoading] = useState<boolean>(false);
 
   const getAllPosts = async () => {
     setLoading(true);
     const response = await requestToApi
-      .get("/home/following/")
+      .get(`/hashtag/${name}`)
       .catch((err) => err.response);
 
     if (response.data.success) {
