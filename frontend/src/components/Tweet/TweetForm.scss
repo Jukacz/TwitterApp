@@ -7,19 +7,6 @@
   border-bottom: 1px solid #e8e8e8;
 }
 
-.tweet-input {
-  border: none;
-  padding: 10px;
-  font-size: 16px;
-  line-height: 1.5;
-  min-height: 100px;
-  resize: vertical;
-  outline: none;
-  background-color: #f5f8fa;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
-
 .blue-text {
   color: blue;
 }
@@ -49,7 +36,7 @@
 
 .tweet-input {
   resize: none;
-  width: 100%;
+  width: 90%;
   height: 100px;
   padding: 10px;
   font-size: 18px;
