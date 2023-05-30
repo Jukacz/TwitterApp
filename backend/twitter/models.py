@@ -16,7 +16,7 @@ class Tweet(models.Model):
     uuid = models.UUIDField(default=uuid4, editable=False, unique=True)
     is_deleted = models.BooleanField(default=False)
     like_count = models.IntegerField(default=0)
-    comment_count = models.IntegerField(default=0)
+    comment_count = models.IntegerField(default=0) 
 
     def __str__(self):
         return self.content
@@ -40,3 +40,17 @@ class Relationship(models.Model):
 
     def __str__(self):
         return f'{self.follower} follows {self.following}'
+    
+class Hashtag(models.Model):
+    name = models.CharField(max_length=140)
+    tweet_count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+class TweetHashtag(models.Model):
+    tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE)
+    hashtag = models.ForeignKey(Hashtag, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.tweet} has hashtag {self.hashtag}'

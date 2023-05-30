@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./TweetForm.scss";
+import requestToApi from "../axios";
 
 interface TweetFormProps {
   onTweetSubmit: (tweetText: string) => void;
@@ -15,10 +16,14 @@ const TweetForm: React.FC<TweetFormProps> = ({ onTweetSubmit, avatarUrl }) => {
     setTweetText(value);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (tweetText.trim() !== "") {
-      onTweetSubmit(tweetText);
+      const response_from_creating_tweet = await requestToApi.post("/create-tweet/", {
+        content: tweetText,
+      })
+
+      console.log(response_from_creating_tweet)
       setTweetText("");
     }
   };
