@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import "./TweetForm.scss";
 
-interface TweetFormProps {
-  onTweetSubmit: (tweetText: string) => void;
-  avatarUrl: string;
-}
-
-const TweetForm: React.FC<TweetFormProps> = ({ onTweetSubmit, avatarUrl }) => {
+const TweetForm: React.FC = () => {
   const [tweetText, setTweetText] = useState("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -15,11 +10,27 @@ const TweetForm: React.FC<TweetFormProps> = ({ onTweetSubmit, avatarUrl }) => {
     setTweetText(value);
   };
 
+  // const formatTweetText = (text: string) => {
+  //   const formattedText = text
+  //     .replace(/(@\S+)/g, '<span class="green-text">$1</span>')
+  //     .replace(/(#\S+)/g, '<span class="blue-text">$1</span>');
+  //   return formattedText;
+  // };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    let isHashtag = false;
     if (tweetText.trim() !== "") {
-      onTweetSubmit(tweetText);
-      setTweetText("");
+      const array_of_hashtags = [];
+      const array_of_word = tweetText.split(" ");
+      for (const word of array_of_word) {
+        if (word.startsWith("#")) {
+          isHashtag = true;
+          array_of_hashtags.push(word);
+          console.log("isHashtag", word);
+        }
+      }
+      console.log("array_of_hashtags", array_of_hashtags);
     }
   };
 
@@ -27,7 +38,11 @@ const TweetForm: React.FC<TweetFormProps> = ({ onTweetSubmit, avatarUrl }) => {
     <form onSubmit={handleSubmit} className="tweet-form">
       <div className="tweet-header">
         <div className="avatar-container">
-          <img src={avatarUrl} alt="User avatar" className="avatar" />
+          <img
+            src="https://picsum.photos/200"
+            alt="User avatar"
+            className="avatar"
+          />
         </div>
         <textarea
           className="tweet-input"
@@ -42,6 +57,11 @@ const TweetForm: React.FC<TweetFormProps> = ({ onTweetSubmit, avatarUrl }) => {
         </button>
         <span className="character-count">{280 - tweetText.length}</span>
       </div>
+      {/* <div className="formatted-tweet-text">
+        <span
+          dangerouslySetInnerHTML={{ __html: formatTweetText(tweetText) }}
+        />
+      </div> */}
     </form>
   );
 };

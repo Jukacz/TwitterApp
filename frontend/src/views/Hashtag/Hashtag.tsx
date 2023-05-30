@@ -34,26 +34,9 @@ const Hashtag: React.FC = () => {
     getAllPosts();
   }, []);
 
-  const handleTweetSubmit = (tweetText: string) => {
-    if (tweetText.length > 1) {
-      if (tweetText.includes("#")) {
-        console.log("tweetText", tweetText);
-        return;
-      }
-      toast({
-        title: "Tweet musi zawierać co najmiej jeden hasztag",
-        status: "warning",
-      });
-    }
-  };
-
   return (
     <div className="dashboard-container">
       <div>
-        <TweetForm
-          onTweetSubmit={handleTweetSubmit}
-          avatarUrl="https://media.gettyimages.com/id/1322571825/photo/robert-lewandowski-of-poland-poses-during-the-official-uefa-euro-2020-media-access-day-on.jpg?s=612x612&w=gi&k=20&c=uQjS0WUHg9EY-t3ghuvm_n_oJUiyDFPaE6IBC1IRRvo="
-        />
         <Skeleton isLoaded={!loading}>
           <div className="tweets">
             <h2>Najnowsze Posty</h2>
