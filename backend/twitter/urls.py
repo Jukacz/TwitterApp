@@ -21,4 +21,5 @@ urlpatterns = [
     path('comment/<uuid:uuid>/', views.CommentView.as_view()),
     path('like/', views.LikeView.as_view()),
     path('hashtag/<str:name>/', views.HashtagView.as_view()),
+    path('last-hashtags/', views.LastTenHashtagsView.as_view()),
 ]

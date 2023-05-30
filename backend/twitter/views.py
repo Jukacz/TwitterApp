@@ -282,3 +282,12 @@ class HashtagView(generics.GenericAPIView):
         tweets = TweetHashtag.objects.filter(hashtag=hashtag).order_by('-tweet__created_at')
         tweets = [{'username': t.tweet.user.user.username, 'content': t.tweet.content, 'created_at': t.tweet.created_at} for t in tweets]
         return Response(status=HTTP_200_OK, data={'tweets': tweets, 'success': True})
+
+class LastTenHashtagsView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = HashtagSerializer
+
+    def get(self, request):
+        hashtags = Hashtag.objects.all().order_by('-tweet_count')[:10]
+        hashtags = [h.name for h in hashtags]
+        return Response(status=HTTP_200_OK, data={'hashtags': hashtags, 'success': True})
