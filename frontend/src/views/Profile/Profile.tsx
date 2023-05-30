@@ -47,6 +47,8 @@ const Profile: React.FC = () => {
   useEffect(() => {
     console.log(profile);
   }, [profile]);
+
+  const make_follow = async () => {};
   return (
     <div className="profile-container">
       <Skeleton isLoaded={!loading}>
@@ -64,7 +66,7 @@ const Profile: React.FC = () => {
               <img src="https://picsum.photos/200" alt="Profile" />
             </div>
             {!isThisMyProfile && (
-              <button className="follow-button">
+              <button onClick={() => make_follow} className="follow-button">
                 {profile?.following_already ? "Obserwujesz" : "Zaobserwuj"}
               </button>
             )}
@@ -110,24 +112,34 @@ const Profile: React.FC = () => {
           </h2>
         </div>
         <div className="profile-posts-container">
-          {profile?.tweets.map((tweet, index) => {
-            return (
-              <Post
-                key={index}
-                tweet_id={tweet.id}
-                tweet_uuid={tweet.uuid}
-                content={tweet.content}
-                created_at={tweet.created_at}
-                author={{
-                  first_name: tweet.first_name,
-                  username: tweet.username,
-                }}
-                comment_numnber={tweet.comment_count}
-                likes_number={tweet.like_count}
-                updated_at={tweet.updated_at}
-              />
-            );
-          })}
+          {profile?.tweets.length === 0 ? (
+            <h1 className="zero-tweets">
+              {isThisMyProfile
+                ? "Nic nie zapostowaleś"
+                : "Ten użytkownik nie ma zadnych tweetów"}
+            </h1>
+          ) : (
+            <>
+              {profile?.tweets.map((tweet, index) => {
+                return (
+                  <Post
+                    key={index}
+                    tweet_id={tweet.id}
+                    tweet_uuid={tweet.uuid}
+                    content={tweet.content}
+                    created_at={tweet.created_at}
+                    author={{
+                      first_name: tweet.first_name,
+                      username: tweet.username,
+                    }}
+                    comment_numnber={tweet.comment_count}
+                    likes_number={tweet.like_count}
+                    updated_at={tweet.updated_at}
+                  />
+                );
+              })}
+            </>
+          )}
         </div>
       </div>
     </div>
