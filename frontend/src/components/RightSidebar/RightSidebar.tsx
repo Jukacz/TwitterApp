@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./RightSidebar.scss";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { lastHashtagInterface } from "../../intefaces";
+import { useToast } from "@chakra-ui/react";
 import requestToApi from "../axios";
 import { UserInterface } from "../ModalFollowers/interface";
 import { useToast } from "@chakra-ui/react";
@@ -8,24 +11,14 @@ import { set } from "cookies";
 
 const RightSidebar: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
+  const [lastHashtags, setlastHashtags] = useState<string[]>([]);
   const navigate = useNavigate();
+  const toast = useToast();
   const [users, setUsers] = useState<UserInterface[]>([]);
   const [filtredList, setFiltredList] = useState<string[]>([]);
   const [nonFollowedUsers, setNonFollowedUsers] = useState<UserInterface[]>([]);
-  const toats = useToast();
-
-  const hashtags = ["react", "typescript", "javascript"];
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(event.target.value);
-  };
-
-  const filteredHashtags = hashtags.filter((hashtag) =>
-    hashtag.toLowerCase().includes(searchValue.toLowerCase())
-  );
-
-  useEffect(() => {
-    const init = async () => {
+  
+    const get_non_follow_users = async () => {
       const response_from_users = await requestToApi
         .get("me/iDontFollow/")
         .catch((err) => err.response);
@@ -40,9 +33,29 @@ const RightSidebar: React.FC = () => {
         status: "error",
       });
     };
+  const getLastHashtags = async () => {
+    const response = await requestToApi
+      .get("last-hashtags/")
+      .catch((err) => err.response);
 
-    init();
+    if (response.data.success) {
+      setlastHashtags(response.data.hashtags);
+      console.log("hashtags", response.data.hashtags);
+      return;
+    }
+    toast({
+      title: "Nie udało sie pobrać hashtagów",
+      description: "Spróbuj ponownie później",
+    });
+  };
+  useEffect(() => {
+    getLastHashtags();
+     get_non_follow_users();
   }, []);
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
 
   useEffect(() => {
     if (searchValue.length === 0) return;
@@ -87,7 +100,7 @@ const RightSidebar: React.FC = () => {
         <>
           <div className="hashtags-container">
             <h2>Popular hashtags</h2>
-            {hashtags.map((hashtag, index) => (
+            {lastHashtags.map((hashtag, index) => (
               <div
                 key={index}
                 onClick={() => navigate(`/hashtag/${hashtag}`)}
