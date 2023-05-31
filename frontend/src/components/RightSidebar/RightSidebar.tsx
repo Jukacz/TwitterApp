@@ -6,33 +6,32 @@ import { lastHashtagInterface } from "../../intefaces";
 import { useToast } from "@chakra-ui/react";
 import requestToApi from "../axios";
 import { UserInterface } from "../ModalFollowers/interface";
-import { useToast } from "@chakra-ui/react";
 import { set } from "cookies";
 
 const RightSidebar: React.FC = () => {
   const [searchValue, setSearchValue] = useState("");
   const [lastHashtags, setlastHashtags] = useState<string[]>([]);
   const navigate = useNavigate();
-  const toast = useToast();
   const [users, setUsers] = useState<UserInterface[]>([]);
   const [filtredList, setFiltredList] = useState<string[]>([]);
   const [nonFollowedUsers, setNonFollowedUsers] = useState<UserInterface[]>([]);
-  
-    const get_non_follow_users = async () => {
-      const response_from_users = await requestToApi
-        .get("me/iDontFollow/")
-        .catch((err) => err.response);
+  const toast = useToast();
 
-      if (response_from_users.data.success) {
-        setNonFollowedUsers(response_from_users.data.users);
-        return;
-      }
-      toats({
-        title: "Błąd",
-        description: "Nie udało się pobrać użytkowników",
-        status: "error",
-      });
-    };
+  const get_non_follow_users = async () => {
+    const response_from_users = await requestToApi
+      .get("me/iDontFollow/")
+      .catch((err) => err.response);
+
+    if (response_from_users.data.success) {
+      setNonFollowedUsers(response_from_users.data.users);
+      return;
+    }
+    toast({
+      title: "Błąd",
+      description: "Nie udało się pobrać użytkowników",
+      status: "error",
+    });
+  };
   const getLastHashtags = async () => {
     const response = await requestToApi
       .get("last-hashtags/")
@@ -50,7 +49,7 @@ const RightSidebar: React.FC = () => {
   };
   useEffect(() => {
     getLastHashtags();
-     get_non_follow_users();
+    get_non_follow_users();
   }, []);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +60,6 @@ const RightSidebar: React.FC = () => {
     if (searchValue.length === 0) return;
 
     const searchFn = async () => {
-      setFiltredList([]);
       if (searchValue.startsWith("@")) {
         const response_from_search_users = await requestToApi
           .post("search/users/", { user: searchValue.slice(1) })
@@ -99,7 +97,7 @@ const RightSidebar: React.FC = () => {
       {searchValue.length === 0 ? (
         <>
           <div className="hashtags-container">
-            <h2>Popular hashtags</h2>
+            <h2>Najpopularniejsze Hasztagi</h2>
             {lastHashtags.map((hashtag, index) => (
               <div
                 key={index}
@@ -111,7 +109,7 @@ const RightSidebar: React.FC = () => {
             ))}
           </div>
           <div className="users-container">
-            <h2>Users you don't follow</h2>
+            <h2>Użytkownicy, których nie obserwujesz</h2>
             {nonFollowedUsers.length === 0 ? (
               <h1 className="u-folow-everyone">Followujesz Wszystkich</h1>
             ) : (

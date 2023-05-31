@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import requestToApi from "../../components/axios";
 import UserContext from "../../contexts/user.context";
 import { ProfileInterface } from "../../intefaces";
-import { Skeleton, useToast } from "@chakra-ui/react";
+import { Skeleton, Tooltip, useToast } from "@chakra-ui/react";
 import { Post } from "../../components";
 import ModalFollowers from "../../components/ModalFollowers/ModalFollowers";
 
@@ -108,18 +108,28 @@ const Profile: React.FC = () => {
             <div>
               <img src="https://picsum.photos/200" alt="Profile" />
             </div>
-            {!isThisMyProfile && (
-              <button
-                onClick={() => make_follow()}
-                className={`follow-button ${
-                  profile?.following_already
-                    ? "folllowing_already"
-                    : "following_not_yet"
-                }`}
-              >
-                {profile?.following_already ? "Obserwujesz" : "Zaobserwuj"}
-              </button>
-            )}
+            <Tooltip
+              label={
+                profile?.following_already
+                  ? "Kliknij, aby przestać obserwowanie tego użytkownika"
+                  : "Kliknij, aby zaczać obserwować!"
+              }
+              hasArrow
+              openDelay={250}
+            >
+              {!isThisMyProfile && (
+                <button
+                  onClick={() => make_follow()}
+                  className={`follow-button ${
+                    profile?.following_already
+                      ? "folllowing_already"
+                      : "following_not_yet"
+                  }`}
+                >
+                  {profile?.following_already ? "Obserwujesz" : "Zaobserwuj"}
+                </button>
+              )}
+            </Tooltip>
           </div>
         </Skeleton>
         <div className="profile-text">
@@ -138,22 +148,32 @@ const Profile: React.FC = () => {
           <div className="flex-box-div">
             <Skeleton isLoaded={!loading}>
               <ModalFollowers username={name!} mode="followers">
-                <div className="profile-followers">
-                  <p>
-                    {profile?.count_followers}
-                    <span>Obserwujących</span>
-                  </p>
-                </div>
+                <Tooltip
+                  label={`Kliknij, aby zobaczyc kto obserwuje ${name}`}
+                  hasArrow
+                >
+                  <div className="profile-followers button-click">
+                    <p>
+                      {profile?.count_followers}
+                      <span>Obserwujących</span>
+                    </p>
+                  </div>
+                </Tooltip>
               </ModalFollowers>
             </Skeleton>
             <Skeleton isLoaded={!loading}>
               <ModalFollowers username={name!} mode="following">
-                <div className="profile-following">
-                  <p>
-                    {profile?.count_following}
-                    <span>Obserwuje</span>
-                  </p>
-                </div>
+                <Tooltip
+                  label={`Kliknij, aby zobaczyc kogo obserwuje ${name}`}
+                  hasArrow
+                >
+                  <div className="profile-following">
+                    <p>
+                      {profile?.count_following}
+                      <span>Obserwuje</span>
+                    </p>
+                  </div>
+                </Tooltip>
               </ModalFollowers>
             </Skeleton>
           </div>

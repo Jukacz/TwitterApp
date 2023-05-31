@@ -31,6 +31,19 @@
         height: 150px;
         border-radius: 50%;
       }
+
+      button {
+        border-radius: 50px;
+        padding: 10px;
+        width: 150px;
+        color: white;
+      }
+      .folllowing_already {
+        background-color: rgb(24, 24, 24);
+      }
+      .following_not_yet {
+        background-color: $twitterColor;
+      }
     }
     .profile-text {
       display: flex;

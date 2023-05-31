@@ -44,6 +44,7 @@ const ModalFollowers: React.FC<ModalProps> = ({ mode, username, children }) => {
         style={{
           width: "fit-content",
           height: "fit-content",
+          cursor: "pointer",
         }}
         onClick={onOpen}
       >

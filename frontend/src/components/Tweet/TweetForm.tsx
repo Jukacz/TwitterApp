@@ -44,6 +44,7 @@ const TweetForm: React.FC = () => {
           title: "Tweet został utworzony",
           status: "success",
         });
+        setTweetText("");
         return;
       }
       toast({
