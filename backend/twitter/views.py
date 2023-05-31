@@ -1,4 +1,4 @@
-from .serializers import UserLoginSerializer, TweetSerializer, LikeSerializer, HashtagSerializer, CommentSerializer, TwitterFollowingSerializer, CreateCommentSerializer, TweetDeleteSerializer, RelationshipSerializer, TwitterFollowerSerializer, UserRegisterSerializer
+from .serializers import UserLoginSerializer, TweetSerializer, LikeSerializer, HashtagSerializer, CommentSerializer, TwitterFollowingSerializer, CreateCommentSerializer, TweetDeleteSerializer, RelationshipSerializer, TwitterFollowerSerializer, UserRegisterSerializer, following
 from .models import Comment, Like, TwitterUser, Tweet, Relationship, Hashtag, TweetHashtag
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
@@ -110,6 +110,8 @@ class UserProfileView(generics.GenericAPIView):
         are_you_follow_him = Relationship.objects.filter(follower=my_account, following=twitter_user).exists()
         print(Relationship.objects.filter(follower=twitter_user).all())
         data = self.serializer_class(tweets, many=True).data
+        for tweet in data:
+            tweet['already_liked'] = Like.objects.filter(user=my_account, tweet__uuid=tweet['uuid']).exists()
         return Response({"profile": {'tweets': data, "count_following": count_following, "count_followers": count_followers,"following_already": are_you_follow_him,"first_name": personal_informations.first_name, "last_name": personal_informations.last_name, "id": personal_informations.id}, 'success': True})
 
 class UserFollowersView(generics.GenericAPIView):
@@ -135,6 +137,34 @@ class UserFollowingView(generics.GenericAPIView):
         data = self.serializer_class(following, many=True).data
         count_following = len(data)
         return Response({'users': data, "following_count": count_following, "success": True}, status=HTTP_200_OK)
+    
+class UserThatIDontFollow(generics.GenericAPIView):
+    serializer_class = following
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        # get all users that i dont follow
+        user = request.user
+        twitter_user = TwitterUser.objects.get(user=user)
+        following = Relationship.objects.filter(follower=twitter_user)
+        users = TwitterUser.objects.exclude(user__in=following.values_list('following', flat=True)).exclude(user=user)
+        print(users)
+        data = self.serializer_class(users, many=True).data
+        return Response({'users': data, 'success': True})
+
+class FindHashtags(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        hashtag = Hashtag.objects.filter(name__contains=request.data.get("hashtag"))
+        return Response({'hasztags': [i.name for i in hashtag], 'success': True})
+    
+class FindUsers(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = User.objects.filter(username__contains=request.data.get("user"))
+        return Response({'users': [i.username for i in user], 'success': True})
 
 class CreateRelationshipView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)
@@ -210,6 +240,7 @@ class TweetView(generics.GenericAPIView):
         comments = Comment.objects.filter(tweet=tweet, is_deleted=False).order_by('-created_at')
         comments = [{'username': c.user.user.username, 'content': c.content, 'created_at': c.created_at} for c in comments]
         data = self.serializer_class(tweet).data
+        data['already_liked'] = Like.objects.filter(user__user=request.user, tweet__uuid=uuid).exists()
         return Response(status=HTTP_200_OK, data={'tweet': data, 'comments': comments, 'success': True})
 
 class CommentView(generics.GenericAPIView):
@@ -250,6 +281,7 @@ class LikeView(generics.GenericAPIView):
         tweet = get_object_or_404(Tweet, uuid=request.data.get('uuid'))
         user = TwitterUser.objects.get(user=request.user)
         found_like = Like.objects.filter(tweet=tweet, user=user)
+        print(found_like)
         if found_like.exists():
             try:
                 found_like.delete()

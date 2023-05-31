@@ -22,14 +22,16 @@ const Post: React.FC<PostProps> = (props) => {
     likes_number,
     comment_numnber,
     updated_at,
+    liked,
     ...HTMLElements
   } = props;
   const navigate = useNavigate();
 
-  const [licked, setLicked] = useState(false);
+  const [licked, setLicked] = useState(liked);
   const [openedComments, setOpenedComments] = useState(false);
   const [comments, setComments] = useState<TweetComment[]>([]);
   const [commentText, setCommentText] = useState("");
+
   const toast = useToast();
 
   const calculateTime = (time: string) => {
@@ -59,7 +61,7 @@ const Post: React.FC<PostProps> = (props) => {
       .catch((err) => err.response);
 
     if (response_from_like.data.success) {
-      setLicked(true);
+      setLicked((state) => !state);
       return;
     }
     toast({
