@@ -74,9 +74,6 @@ const Sidebar: React.FC = () => {
           <NavLink to="/">
             <FontAwesomeIcon icon={faHouse} className="fa-icon" /> Strona Główna{" "}
           </NavLink>
-          <NavLink to="/hashtags">
-            <FontAwesomeIcon icon={faHashtag} className="fa-icon" /> Odkrywaj
-          </NavLink>
           <NavLink to={`/${myUsermame}`}>
             <FontAwesomeIcon icon={faUser} className="fa-icon" /> Profile
           </NavLink>

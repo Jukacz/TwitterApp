@@ -2,7 +2,7 @@ import "./Post.scss";
 import React, { useEffect, useState } from "react";
 import { PostProps, TweetComment } from "./interfaces";
 import moment from "moment";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faComment,
@@ -22,14 +22,16 @@ const Post: React.FC<PostProps> = (props) => {
     likes_number,
     comment_numnber,
     updated_at,
+    liked,
     ...HTMLElements
   } = props;
   const navigate = useNavigate();
 
-  const [licked, setLicked] = useState(false);
+  const [licked, setLicked] = useState(liked);
   const [openedComments, setOpenedComments] = useState(false);
   const [comments, setComments] = useState<TweetComment[]>([]);
   const [commentText, setCommentText] = useState("");
+
   const toast = useToast();
 
   const calculateTime = (time: string) => {
@@ -59,7 +61,7 @@ const Post: React.FC<PostProps> = (props) => {
       .catch((err) => err.response);
 
     if (response_from_like.data.success) {
-      setLicked(true);
+      setLicked((state) => !state);
       return;
     }
     toast({
@@ -137,7 +139,35 @@ const Post: React.FC<PostProps> = (props) => {
             <div className="post-created-at">{calculateTime(created_at)}</div>
           </div>
         </div>
-        <div className="post-content">{content}</div>
+        <div className="post-content">
+          {content.split(" ").map((word, index) => {
+            console.log(word.trim());
+            if (word.startsWith("#")) {
+              return (
+                <NavLink
+                  className="hashtag"
+                  to={`/hashtag/${word.substring(1)}`}
+                  key={index}
+                >
+                  {word}{" "}
+                </NavLink>
+              );
+            }
+            if (word.startsWith("@")) {
+              return (
+                <NavLink
+                  className="hashtag"
+                  to={`/${word.substring(1)}`}
+                  key={index}
+                >
+                  {word}{" "}
+                </NavLink>
+              );
+            }
+
+            return word + " ";
+          })}
+        </div>
         <div className="post-footer">
           <div className="footer-buttons-section">
             <button

@@ -14,6 +14,7 @@ export interface PostProps extends HTMLAttributes<HTMLDivElement> {
   likes_number: number;
   comment_numnber: number;
   updated_at: string;
+  liked: boolean;
 }
 
 export interface TweetComment {

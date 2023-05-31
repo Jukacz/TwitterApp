@@ -71,7 +71,6 @@ li {
   display: flex;
   align-items: center;
   height: 50px;
-  // padding: 0 1rem;
   cursor: pointer;
 }
 
@@ -81,11 +80,31 @@ li:hover {
 
 span {
   margin-left: 0.5rem;
-  // font-size: 1.2rem;
 }
 
 .fa-icon {
   width: 24px;
   height: 24px;
   margin-right: 1rem;
+}
+
+@media screen and (max-width: 750px) {
+  .sidebar-footer {
+    .user-info {
+      h4,
+      p {
+        display: none;
+      }
+    }
+  }
+
+  .sidebar-menu {
+    ul {
+      li {
+        span {
+          display: none;
+        }
+      }
+    }
+  }
 }

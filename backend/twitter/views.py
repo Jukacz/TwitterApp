@@ -1,5 +1,5 @@
-from .serializers import UserLoginSerializer, TweetSerializer, LikeSerializer, CommentSerializer, TwitterFollowingSerializer, CreateCommentSerializer, TweetDeleteSerializer, RelationshipSerializer, TwitterFollowerSerializer, UserRegisterSerializer
-from .models import Comment, Like, TwitterUser, Tweet, Relationship
+from .serializers import UserLoginSerializer, TweetSerializer, LikeSerializer, HashtagSerializer, CommentSerializer, TwitterFollowingSerializer, CreateCommentSerializer, TweetDeleteSerializer, RelationshipSerializer, TwitterFollowerSerializer, UserRegisterSerializer, following
+from .models import Comment, Like, TwitterUser, Tweet, Relationship, Hashtag, TweetHashtag
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
@@ -12,6 +12,7 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_401_UNAUTHORIZED,
 )
+import re
 
 class LoginView(generics.GenericAPIView):
     serializer_class = UserLoginSerializer
@@ -74,6 +75,22 @@ class FollowingView(generics.GenericAPIView):
         for f in following:
             tweets |= Tweet.objects.filter(user=f.following, is_deleted=False).order_by('-created_at')
         data = self.serializer_class(tweets, many=True).data
+        for tweet in data:
+            tweet['already_liked'] = Like.objects.filter(user=twitter_user, tweet__uuid=tweet['uuid']).exists()
+        return Response({'tweets': data, 'success': True})
+    
+class TweetsView(generics.GenericAPIView):
+    serializer_class = TweetSerializer
+    permission_classes = (IsAuthenticated,)
+    def get(self, request):
+    # get all tweets from all users that i dont follow
+        user = request.user
+        twitter_user = TwitterUser.objects.get(user=user)
+        following = Relationship.objects.filter(follower=twitter_user)
+        tweets = Tweet.objects.exclude(user__in=following.values_list('following', flat=True)).exclude(user=twitter_user, is_deleted=False).order_by('-created_at')
+        data = self.serializer_class(tweets, many=True).data
+        for tweet in data:
+            tweet['already_liked'] = Like.objects.filter(user=twitter_user, tweet__uuid=tweet['uuid']).exists()
         return Response({'tweets': data, 'success': True})
 
 class UserProfileView(generics.GenericAPIView):
@@ -83,14 +100,19 @@ class UserProfileView(generics.GenericAPIView):
     def get(self, request, username):
         user = get_object_or_404(User, username=username)
         twitter_user = TwitterUser.objects.get(user=user)
-        user_from_query = TwitterUser.objects.get(user=request.user)
+        my_account = TwitterUser.objects.get(user=request.user)
+        print(twitter_user, my_account)
         personal_informations = User.objects.get(username=username)
+        print(personal_informations.id)
         tweets = Tweet.objects.filter(user=twitter_user, is_deleted=False).order_by('-created_at')
         count_followers = Relationship.objects.filter(following=twitter_user).count()
         count_following = Relationship.objects.filter(follower=twitter_user).count()
-        are_you_follow_him = Relationship.objects.filter(follower=user_from_query, following=twitter_user).exists()
+        are_you_follow_him = Relationship.objects.filter(follower=my_account, following=twitter_user).exists()
+        print(Relationship.objects.filter(follower=twitter_user).all())
         data = self.serializer_class(tweets, many=True).data
-        return Response({"profile": {'tweets': data, "count_following": count_following, "count_followers": count_followers,"following_already": are_you_follow_him,"first_name": personal_informations.first_name, "last_name": personal_informations.last_name}, 'success': True})
+        for tweet in data:
+            tweet['already_liked'] = Like.objects.filter(user=my_account, tweet__uuid=tweet['uuid']).exists()
+        return Response({"profile": {'tweets': data, "count_following": count_following, "count_followers": count_followers,"following_already": are_you_follow_him,"first_name": personal_informations.first_name, "last_name": personal_informations.last_name, "id": personal_informations.id}, 'success': True})
 
 class UserFollowersView(generics.GenericAPIView):
     serializer_class = TwitterFollowerSerializer
@@ -102,7 +124,7 @@ class UserFollowersView(generics.GenericAPIView):
         followers = Relationship.objects.filter(following=twitter_user)
         data = self.serializer_class(followers, many=True).data
         count_followers = len(data)
-        return Response({'followers': data, "followers_count": count_followers, "success": True}, status=HTTP_200_OK)
+        return Response({'users': data, "followers_count": count_followers, "success": True}, status=HTTP_200_OK)
 
 class UserFollowingView(generics.GenericAPIView):
     serializer_class = TwitterFollowingSerializer
@@ -114,7 +136,35 @@ class UserFollowingView(generics.GenericAPIView):
         following = Relationship.objects.filter(follower=twitter_user)
         data = self.serializer_class(following, many=True).data
         count_following = len(data)
-        return Response({'following': data, "following_count": count_following, "success": True}, status=HTTP_200_OK)
+        return Response({'users': data, "following_count": count_following, "success": True}, status=HTTP_200_OK)
+    
+class UserThatIDontFollow(generics.GenericAPIView):
+    serializer_class = following
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        # get all users that i dont follow
+        user = request.user
+        twitter_user = TwitterUser.objects.get(user=user)
+        following = Relationship.objects.filter(follower=twitter_user)
+        users = TwitterUser.objects.exclude(user__in=following.values_list('following', flat=True)).exclude(user=user)
+        print(users)
+        data = self.serializer_class(users, many=True).data
+        return Response({'users': data, 'success': True})
+
+class FindHashtags(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        hashtag = Hashtag.objects.filter(name__contains=request.data.get("hashtag"))
+        return Response({'hasztags': [i.name for i in hashtag], 'success': True})
+    
+class FindUsers(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = User.objects.filter(username__contains=request.data.get("user"))
+        return Response({'users': [i.username for i in user], 'success': True})
 
 class CreateRelationshipView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)
@@ -125,17 +175,23 @@ class CreateRelationshipView(generics.GenericAPIView):
         following = get_object_or_404(TwitterUser, user__id=request.data.get('follower'))
         if Relationship.objects.filter(follower=follower, following=following).exists():
             return Response(status=HTTP_400_BAD_REQUEST, data={'success': False, 'error': 'Already following'})
-        
+        data = request.data
+        data['follower'] = follower.id
+        data['following'] = following.id
+        print(follower)
+        print(following)
         serializer = self.serializer_class(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            print(request.data.get('follower'))
         except Exception as e:
             return Response(status=HTTP_400_BAD_REQUEST, data={'success': False, 'error': str(e)})
         return Response(status=HTTP_200_OK, data={'success': True})
 
     def delete(self, request):
         follower = TwitterUser.objects.get(user=request.user)
+        print(request.data)
         following = get_object_or_404(TwitterUser, user__id=request.data.get('follower'))
         relationship = get_object_or_404(Relationship, follower=follower, following=following)
         relationship.delete()
@@ -148,8 +204,20 @@ class CreateTweetView(generics.GenericAPIView):
 
     def post(self, request):
         user = TwitterUser.objects.get(user=request.user)
-        tweet = Tweet(user=user, content=request.data.get('content'))
+        content = request.data.get('content')
+        tweet = Tweet(user=user, content=content)
         tweet.save()
+        if '#' in content:
+            hashtags = re.findall(r"#(\w+)", content)
+            for hashtag in hashtags:
+                try:
+                    hashtag_obj = Hashtag.objects.get(name=hashtag)
+                except Hashtag.DoesNotExist:
+                    hashtag_obj = Hashtag.objects.create(name=hashtag)
+                hashtag_obj.tweet_count += 1
+                hashtag_obj.save()
+                tweethashtag = TweetHashtag(tweet=tweet, hashtag=hashtag_obj)
+                tweethashtag.save()
         data = self.serializer_class(tweet).data
         return Response({'tweet': data, 'success': True}, status=HTTP_200_OK)
     
@@ -172,6 +240,7 @@ class TweetView(generics.GenericAPIView):
         comments = Comment.objects.filter(tweet=tweet, is_deleted=False).order_by('-created_at')
         comments = [{'username': c.user.user.username, 'content': c.content, 'created_at': c.created_at} for c in comments]
         data = self.serializer_class(tweet).data
+        data['already_liked'] = Like.objects.filter(user__user=request.user, tweet__uuid=uuid).exists()
         return Response(status=HTTP_200_OK, data={'tweet': data, 'comments': comments, 'success': True})
 
 class CommentView(generics.GenericAPIView):
@@ -179,7 +248,6 @@ class CommentView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self,request, uuid):
-        print(uuid)
         tweet = get_object_or_404(Tweet, uuid=uuid)
         user = TwitterUser.objects.get(user=request.user)
         comment = Comment(user=user, tweet=tweet, content=request.data.get('content'))
@@ -212,13 +280,21 @@ class LikeView(generics.GenericAPIView):
     def post(self, request):
         tweet = get_object_or_404(Tweet, uuid=request.data.get('uuid'))
         user = TwitterUser.objects.get(user=request.user)
-        if Like.objects.filter(tweet=tweet, user=user).exists():
-            return Response(status=HTTP_400_BAD_REQUEST, data={'success': False, 'error': 'Already liked'})
+        found_like = Like.objects.filter(tweet=tweet, user=user)
+        print(found_like)
+        if found_like.exists():
+            try:
+                found_like.delete()
+                tweet.like_count -= 1
+                tweet.save()
+                return Response(status=HTTP_200_OK, data={'success': True, 'type': 'unlike'})
+            except Exception as e:
+                return Response(status=HTTP_400_BAD_REQUEST, data={'success': False, 'error': str(e)})
         like = Like(tweet=tweet, user=user)
         like.save()
         tweet.like_count += 1
         tweet.save()
-        return Response(status=HTTP_200_OK, data={'success': True})
+        return Response(status=HTTP_200_OK, data={'success': True, 'type': 'like'})
 
     def delete(self, request):
         tweet = get_object_or_404(Tweet, uuid=request.data.get('uuid'))
@@ -228,3 +304,22 @@ class LikeView(generics.GenericAPIView):
         tweet.like_count -= 1
         tweet.save()
         return Response(status=HTTP_200_OK, data={'success': True})
+
+class HashtagView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = HashtagSerializer
+
+    def get(self, request, name):
+        hashtag = get_object_or_404(Hashtag, name=name)
+        tweets = TweetHashtag.objects.filter(hashtag=hashtag).order_by('-tweet__created_at')
+        tweets = [{'username': t.tweet.user.user.username, 'content': t.tweet.content, 'created_at': t.tweet.created_at} for t in tweets]
+        return Response(status=HTTP_200_OK, data={'tweets': tweets, 'success': True})
+
+class LastTenHashtagsView(generics.GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = HashtagSerializer
+
+    def get(self, request):
+        hashtags = Hashtag.objects.all().order_by('-tweet_count')[:10]
+        hashtags = [h.name for h in hashtags]
+        return Response(status=HTTP_200_OK, data={'hashtags': hashtags, 'success': True})

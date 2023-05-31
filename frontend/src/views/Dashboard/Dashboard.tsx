@@ -6,14 +6,32 @@ import { Skeleton, useToast } from "@chakra-ui/react";
 import { Tweet } from "../../intefaces";
 
 const Dashboard: React.FC = () => {
+  const [myTweets, setMyTweets] = useState<Tweet[]>([]);
   const [tweets, setTweets] = useState<Tweet[]>([]);
   const toast = useToast();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const getAllPosts = async () => {
+  const getMyFollowedTweets = async () => {
     setLoading(true);
     const response = await requestToApi
       .get("/home/following/")
+      .catch((err) => err.response);
+
+    if (response.data.success) {
+      setMyTweets(response.data.tweets);
+      setLoading(false);
+      return;
+    }
+    toast({
+      title: "Nie udało sie pobrać tweetów",
+      description: "Spróbuj ponownie później",
+    });
+  };
+
+  const getAllTweets = async () => {
+    setLoading(true);
+    const response = await requestToApi
+      .get("/home/tweets/")
       .catch((err) => err.response);
 
     if (response.data.success) {
@@ -24,12 +42,14 @@ const Dashboard: React.FC = () => {
     toast({
       title: "Nie udało sie pobrać tweetów",
       description: "Spróbuj ponownie później",
+      status: "error",
     });
   };
 
   useEffect(() => {
     document.title = "Twitter | Strona Główna";
-    getAllPosts();
+    getMyFollowedTweets();
+    getAllTweets();
   }, []);
 
   const handleTweetSubmit = (tweetText: string) => {
@@ -48,29 +68,55 @@ const Dashboard: React.FC = () => {
   return (
     <div className="dashboard-container">
       <div>
-        <TweetForm
-          onTweetSubmit={handleTweetSubmit}
-          avatarUrl="https://media.gettyimages.com/id/1322571825/photo/robert-lewandowski-of-poland-poses-during-the-official-uefa-euro-2020-media-access-day-on.jpg?s=612x612&w=gi&k=20&c=uQjS0WUHg9EY-t3ghuvm_n_oJUiyDFPaE6IBC1IRRvo="
-        />
+        <TweetForm />
         <Skeleton isLoaded={!loading}>
           <div className="tweets">
-            <h2>Najnowsze Posty</h2>
-            {tweets.map((tweet, index) => (
-              <Post
-                key={index}
-                tweet_id={tweet.id}
-                tweet_uuid={tweet.uuid}
-                content={tweet.content}
-                created_at={tweet.created_at}
-                author={{
-                  first_name: tweet.first_name,
-                  username: tweet.username,
-                }}
-                comment_numnber={tweet.comment_count}
-                likes_number={tweet.like_count}
-                updated_at={tweet.updated_at}
-              />
-            ))}
+            {myTweets.length > 0 && (
+              <>
+                <h2>Najnowsze Posty od Twoich Znajomych</h2>
+                {myTweets.map((tweet, index) => (
+                  <Post
+                    key={index}
+                    tweet_id={tweet.id}
+                    tweet_uuid={tweet.uuid}
+                    content={tweet.content}
+                    created_at={tweet.created_at}
+                    author={{
+                      first_name: tweet.first_name,
+                      username: tweet.username,
+                    }}
+                    comment_numnber={tweet.comment_count}
+                    likes_number={tweet.like_count}
+                    updated_at={tweet.updated_at}
+                    liked={tweet.already_liked}
+                  />
+                ))}
+              </>
+            )}
+            {tweets.length > 0 && (
+              <>
+                <h2>Wszystkie Tweety</h2>
+                {tweets.map((tweet, index) => {
+                  return (
+                    <Post
+                      key={index}
+                      tweet_id={tweet.id}
+                      tweet_uuid={tweet.uuid}
+                      content={tweet.content}
+                      created_at={tweet.created_at}
+                      author={{
+                        first_name: tweet.first_name,
+                        username: tweet.username,
+                      }}
+                      comment_numnber={tweet.comment_count}
+                      likes_number={tweet.like_count}
+                      updated_at={tweet.updated_at}
+                      liked={tweet.already_liked}
+                    />
+                  );
+                })}
+              </>
+            )}
           </div>
         </Skeleton>
       </div>

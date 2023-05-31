@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Like, Tweet, TwitterUser, Relationship, Comment
+from .models import Like, Tweet, TwitterUser, Relationship, Comment, Hashtag
 from django.contrib.auth.models import User
 
 class UserLoginSerializer(serializers.ModelSerializer):
@@ -25,15 +25,17 @@ class TweetSerializer(serializers.ModelSerializer):
 
 class TwitterFollowingSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='following.user.username')
+    first_name = serializers.CharField(source='following.user.first_name')
     class Meta:
         model = Relationship
-        fields = ('username',)
+        fields = ('username','first_name')
 
 class TwitterFollowerSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='follower.user.username')
+    first_name = serializers.CharField(source='follower.user.first_name')
     class Meta:
         model = Relationship
-        fields = ('username',)
+        fields = ('username','first_name')
 
 class RelationshipSerializer(serializers.ModelSerializer):
     class Meta:
@@ -62,3 +64,15 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = ('uuid',)
+
+class HashtagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hashtag
+        fields = ('name', 'tweet_count')
+
+class following(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+    first_name = serializers.CharField(source='user.first_name')
+    class Meta:
+        model = TwitterUser
+        fields = ('username', 'first_name')

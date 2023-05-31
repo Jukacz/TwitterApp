@@ -4,8 +4,9 @@ import React, { useContext, useEffect, useState } from "react";
 import requestToApi from "../../components/axios";
 import UserContext from "../../contexts/user.context";
 import { ProfileInterface } from "../../intefaces";
-import { Skeleton, useToast } from "@chakra-ui/react";
+import { Skeleton, Tooltip, useToast } from "@chakra-ui/react";
 import { Post } from "../../components";
+import ModalFollowers from "../../components/ModalFollowers/ModalFollowers";
 
 const Profile: React.FC = () => {
   const { name } = useParams();
@@ -47,6 +48,50 @@ const Profile: React.FC = () => {
   useEffect(() => {
     console.log(profile);
   }, [profile]);
+
+  const make_follow = async () => {
+    if (profile?.following_already) {
+      const response_from_sending_observation = await requestToApi
+        .delete(`/relationship/`, {
+          data: {
+            follower: profile.id,
+          },
+        })
+        .catch((err) => err.response);
+
+      if (!response_from_sending_observation.data.success) {
+        toast({
+          title: "Błąd",
+          description: "Podczas wysyłania obserwacji wystąpił błąd",
+          status: "error",
+        });
+        return;
+      }
+    } else {
+      const response_from_sending_observation = await requestToApi
+        .post(`/relationship/`, {
+          follower: profile!.id,
+        })
+        .catch((err) => err.response);
+
+      if (!response_from_sending_observation.data.success) {
+        toast({
+          title: "Błąd",
+          description: "Podczas wysyłania obserwacji wystąpił błąd",
+          status: "error",
+        });
+        return;
+      }
+    }
+    setProfile((state) => {
+      return {
+        ...state!,
+        following_already: !state!.following_already,
+        count_followers:
+          state!.count_followers + (state!.following_already ? -1 : 1),
+      };
+    });
+  };
   return (
     <div className="profile-container">
       <Skeleton isLoaded={!loading}>
@@ -63,11 +108,28 @@ const Profile: React.FC = () => {
             <div>
               <img src="https://picsum.photos/200" alt="Profile" />
             </div>
-            {!isThisMyProfile && (
-              <button className="follow-button">
-                {profile?.following_already ? "Obserwujesz" : "Zaobserwuj"}
-              </button>
-            )}
+            <Tooltip
+              label={
+                profile?.following_already
+                  ? "Kliknij, aby przestać obserwowanie tego użytkownika"
+                  : "Kliknij, aby zaczać obserwować!"
+              }
+              hasArrow
+              openDelay={250}
+            >
+              {!isThisMyProfile && (
+                <button
+                  onClick={() => make_follow()}
+                  className={`follow-button ${
+                    profile?.following_already
+                      ? "folllowing_already"
+                      : "following_not_yet"
+                  }`}
+                >
+                  {profile?.following_already ? "Obserwujesz" : "Zaobserwuj"}
+                </button>
+              )}
+            </Tooltip>
           </div>
         </Skeleton>
         <div className="profile-text">
@@ -85,20 +147,34 @@ const Profile: React.FC = () => {
           </Skeleton>
           <div className="flex-box-div">
             <Skeleton isLoaded={!loading}>
-              <div className="profile-followers">
-                <p>
-                  {profile?.count_followers}
-                  <span>Obserwujących</span>
-                </p>
-              </div>
+              <ModalFollowers username={name!} mode="followers">
+                <Tooltip
+                  label={`Kliknij, aby zobaczyc kto obserwuje ${name}`}
+                  hasArrow
+                >
+                  <div className="profile-followers button-click">
+                    <p>
+                      {profile?.count_followers}
+                      <span>Obserwujących</span>
+                    </p>
+                  </div>
+                </Tooltip>
+              </ModalFollowers>
             </Skeleton>
             <Skeleton isLoaded={!loading}>
-              <div className="profile-following">
-                <p>
-                  {profile?.count_following}
-                  <span>Obserwuje</span>
-                </p>
-              </div>
+              <ModalFollowers username={name!} mode="following">
+                <Tooltip
+                  label={`Kliknij, aby zobaczyc kogo obserwuje ${name}`}
+                  hasArrow
+                >
+                  <div className="profile-following">
+                    <p>
+                      {profile?.count_following}
+                      <span>Obserwuje</span>
+                    </p>
+                  </div>
+                </Tooltip>
+              </ModalFollowers>
             </Skeleton>
           </div>
         </div>
@@ -110,24 +186,35 @@ const Profile: React.FC = () => {
           </h2>
         </div>
         <div className="profile-posts-container">
-          {profile?.tweets.map((tweet, index) => {
-            return (
-              <Post
-                key={index}
-                tweet_id={tweet.id}
-                tweet_uuid={tweet.uuid}
-                content={tweet.content}
-                created_at={tweet.created_at}
-                author={{
-                  first_name: tweet.first_name,
-                  username: tweet.username,
-                }}
-                comment_numnber={tweet.comment_count}
-                likes_number={tweet.like_count}
-                updated_at={tweet.updated_at}
-              />
-            );
-          })}
+          {profile?.tweets.length === 0 ? (
+            <h1 className="zero-tweets">
+              {isThisMyProfile
+                ? "Nic nie zapostowaleś"
+                : "Ten użytkownik nie ma zadnych tweetów"}
+            </h1>
+          ) : (
+            <>
+              {profile?.tweets.map((tweet, index) => {
+                return (
+                  <Post
+                    key={index}
+                    tweet_id={tweet.id}
+                    tweet_uuid={tweet.uuid}
+                    content={tweet.content}
+                    created_at={tweet.created_at}
+                    author={{
+                      first_name: tweet.first_name,
+                      username: tweet.username,
+                    }}
+                    comment_numnber={tweet.comment_count}
+                    likes_number={tweet.like_count}
+                    updated_at={tweet.updated_at}
+                    liked={tweet.already_liked}
+                  />
+                );
+              })}
+            </>
+          )}
         </div>
       </div>
     </div>
