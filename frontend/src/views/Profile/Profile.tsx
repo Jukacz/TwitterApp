@@ -108,16 +108,16 @@ const Profile: React.FC = () => {
             <div>
               <img src="https://picsum.photos/200" alt="Profile" />
             </div>
-            <Tooltip
-              label={
-                profile?.following_already
-                  ? "Kliknij, aby przestać obserwowanie tego użytkownika"
-                  : "Kliknij, aby zaczać obserwować!"
-              }
-              hasArrow
-              openDelay={250}
-            >
-              {!isThisMyProfile && (
+            {!isThisMyProfile && (
+              <Tooltip
+                label={
+                  profile?.following_already
+                    ? "Kliknij, aby przestać obserwowanie tego użytkownika"
+                    : "Kliknij, aby zaczać obserwować!"
+                }
+                hasArrow
+                openDelay={250}
+              >
                 <button
                   onClick={() => make_follow()}
                   className={`follow-button ${
@@ -128,8 +128,8 @@ const Profile: React.FC = () => {
                 >
                   {profile?.following_already ? "Obserwujesz" : "Zaobserwuj"}
                 </button>
-              )}
-            </Tooltip>
+              </Tooltip>
+            )}
           </div>
         </Skeleton>
         <div className="profile-text">
