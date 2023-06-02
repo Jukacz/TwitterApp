@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./RightSidebar.scss";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -7,49 +7,23 @@ import { useToast } from "@chakra-ui/react";
 import requestToApi from "../axios";
 import { UserInterface } from "../ModalFollowers/interface";
 import { set } from "cookies";
+import VerifyProfileContext from "../../contexts/verifyprofile.context";
+import { RightSideBarInterface } from "./interface";
 
-const RightSidebar: React.FC = () => {
+const RightSidebar: React.FC<RightSideBarInterface> = ({
+  lastHashtags,
+  nonFollowerUsers,
+}) => {
   const [searchValue, setSearchValue] = useState("");
-  const [lastHashtags, setlastHashtags] = useState<string[]>([]);
   const navigate = useNavigate();
-  const [users, setUsers] = useState<UserInterface[]>([]);
   const [filtredList, setFiltredList] = useState<string[]>([]);
-  const [nonFollowedUsers, setNonFollowedUsers] = useState<UserInterface[]>([]);
-  const toast = useToast();
 
-  const get_non_follow_users = async () => {
-    const response_from_users = await requestToApi
-      .get("me/iDontFollow/")
-      .catch((err) => err.response);
+  const context = useContext(VerifyProfileContext)!;
 
-    if (response_from_users.data.success) {
-      setNonFollowedUsers(response_from_users.data.users);
-      return;
-    }
-    toast({
-      title: "Błąd",
-      description: "Nie udało się pobrać użytkowników",
-      status: "error",
-    });
-  };
-  const getLastHashtags = async () => {
-    const response = await requestToApi
-      .get("last-hashtags/")
-      .catch((err) => err.response);
-
-    if (response.data.success) {
-      setlastHashtags(response.data.hashtags);
-      console.log("hashtags", response.data.hashtags);
-      return;
-    }
-    toast({
-      title: "Nie udało sie pobrać hashtagów",
-      description: "Spróbuj ponownie później",
-    });
-  };
+  const { getLastHashtags, get_non_follower_users } = context;
   useEffect(() => {
     getLastHashtags();
-    get_non_follow_users();
+    get_non_follower_users();
   }, []);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,16 +84,16 @@ const RightSidebar: React.FC = () => {
           </div>
           <div className="users-container">
             <h2>Użytkownicy, których nie obserwujesz</h2>
-            {nonFollowedUsers.length === 0 ? (
+            {nonFollowerUsers.length === 0 ? (
               <h1 className="u-folow-everyone">Followujesz Wszystkich</h1>
             ) : (
-              nonFollowedUsers.slice(0, 5).map((user, index) => (
+              nonFollowerUsers.slice(0, 5).map((user, index) => (
                 <div
                   key={index}
-                  onClick={() => navigate(`/${user.username}`)}
+                  onClick={() => navigate(`/${user}`)}
                   className="user"
                 >
-                  @{user.username}
+                  @{user}
                 </div>
               ))
             )}

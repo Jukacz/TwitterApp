@@ -1,11 +1,16 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./TweetForm.scss";
 import requestToApi from "../axios";
 import { useToast } from "@chakra-ui/react";
+import VerifyProfileContext from "../../contexts/verifyprofile.context";
 
 const TweetForm: React.FC = () => {
   const [tweetText, setTweetText] = useState("");
   const toast = useToast();
+
+  const context = useContext(VerifyProfileContext)!;
+
+  const { getLastHashtags } = context;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -45,6 +50,7 @@ const TweetForm: React.FC = () => {
           status: "success",
         });
         setTweetText("");
+        getLastHashtags();
         return;
       }
       toast({

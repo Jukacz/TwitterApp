@@ -7,6 +7,7 @@ import { ProfileInterface } from "../../intefaces";
 import { Skeleton, Tooltip, useToast } from "@chakra-ui/react";
 import { Post } from "../../components";
 import ModalFollowers from "../../components/ModalFollowers/ModalFollowers";
+import VerifyProfileContext from "../../contexts/verifyprofile.context";
 
 const Profile: React.FC = () => {
   const { name } = useParams();
@@ -14,6 +15,9 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const context = useContext(UserContext);
+  const secondContext = useContext(VerifyProfileContext);
+
+  const { get_non_follower_users } = secondContext!;
 
   const isThisMyProfile = context?.user.username === name;
   const toast = useToast();
@@ -46,6 +50,10 @@ const Profile: React.FC = () => {
   }, [name]);
 
   useEffect(() => {
+    if (!profile) return;
+  }, [profile]);
+
+  useEffect(() => {
     console.log(profile);
   }, [profile]);
 
@@ -67,6 +75,7 @@ const Profile: React.FC = () => {
         });
         return;
       }
+      get_non_follower_users();
     } else {
       const response_from_sending_observation = await requestToApi
         .post(`/relationship/`, {
@@ -82,6 +91,7 @@ const Profile: React.FC = () => {
         });
         return;
       }
+      get_non_follower_users();
     }
     setProfile((state) => {
       return {

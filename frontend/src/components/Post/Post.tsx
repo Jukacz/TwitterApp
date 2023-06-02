@@ -28,8 +28,10 @@ const Post: React.FC<PostProps> = (props) => {
   const navigate = useNavigate();
 
   const [licked, setLicked] = useState(liked);
+  const [you_liked, setYou_liked] = useState(false);
   const [openedComments, setOpenedComments] = useState(false);
   const [comments, setComments] = useState<TweetComment[]>([]);
+  const [commentAppend, setCommentAppend] = useState(0);
   const [commentText, setCommentText] = useState("");
 
   const toast = useToast();
@@ -88,6 +90,13 @@ const Post: React.FC<PostProps> = (props) => {
 
   const add_comment = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (commentText.trim() === "") {
+      toast({
+        title: "Nie mozesz dodać komentarza bez żadnej treści",
+        status: "info",
+      });
+      return;
+    }
     const data_to_add_comment = {
       content: commentText,
     };
@@ -102,6 +111,7 @@ const Post: React.FC<PostProps> = (props) => {
         status: "success",
       });
       setCommentText("");
+      setCommentAppend((state) => state + 1);
       const new_comments = await get_comments();
       setComments(new_comments);
       return;
@@ -141,7 +151,6 @@ const Post: React.FC<PostProps> = (props) => {
         </div>
         <div className="post-content">
           {content.split(" ").map((word, index) => {
-            console.log(word.trim());
             if (word.startsWith("#")) {
               return (
                 <NavLink
@@ -183,7 +192,7 @@ const Post: React.FC<PostProps> = (props) => {
               onClick={() => setOpenedComments((state) => !state)}
               className="open-comment-section-button button-post"
             >
-              {comment_numnber}
+              {comment_numnber + commentAppend}
               <FontAwesomeIcon icon={faComment} />
             </button>
           </div>
@@ -200,7 +209,7 @@ const Post: React.FC<PostProps> = (props) => {
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                 />
-                <button className="button-post">
+                <button disabled={commentText.trim() === ""}>
                   Dodaj <FontAwesomeIcon icon={faPaperPlane} />
                 </button>
               </form>
