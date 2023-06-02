@@ -46,7 +46,9 @@ const RightSidebar: React.FC<RightSideBarInterface> = ({
         return;
       }
       const response_from_search_hashtags = await requestToApi
-        .post("/search/hashtags/", { hashtag: searchValue.slice(1) })
+        .post("/search/hashtags/", {
+          hashtag: searchValue.slice(searchValue[0] === "#" ? 1 : 0),
+        })
         .catch((err) => err.response);
 
       if (response_from_search_hashtags.data.success) {
@@ -105,7 +107,7 @@ const RightSidebar: React.FC<RightSideBarInterface> = ({
           {filtredList.length === 0 ? (
             <h1>Nie znaleziono żadnych wyników</h1>
           ) : (
-            filtredList.map((value, index) => (
+            filtredList.slice(0, 10).map((value, index) => (
               <div
                 key={index}
                 onClick={() =>
