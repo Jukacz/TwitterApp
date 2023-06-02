@@ -148,8 +148,7 @@ class UserThatIDontFollow(generics.GenericAPIView):
         twitter_user = TwitterUser.objects.get(user=user)
         following = Relationship.objects.filter(follower=twitter_user)
         users = TwitterUser.objects.exclude(user__in=following.values_list('following', flat=True)).exclude(user=user)
-        print(users)
-        data = self.serializer_class(users, many=True).data
+        data = [i.user.username for i in users]
         return Response({'users': data, 'success': True})
 
 class FindHashtags(generics.GenericAPIView):
@@ -307,12 +306,12 @@ class LikeView(generics.GenericAPIView):
 
 class HashtagView(generics.GenericAPIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = HashtagSerializer
+    serializer_class = TweetSerializer
 
     def get(self, request, name):
         hashtag = get_object_or_404(Hashtag, name=name)
         tweets = TweetHashtag.objects.filter(hashtag=hashtag).order_by('-tweet__created_at')
-        tweets = [{'username': t.tweet.user.user.username, 'content': t.tweet.content, 'created_at': t.tweet.created_at} for t in tweets]
+        tweets = [self.serializer_class(t.tweet).data for t in tweets]
         return Response(status=HTTP_200_OK, data={'tweets': tweets, 'success': True})
 
 class LastTenHashtagsView(generics.GenericAPIView):

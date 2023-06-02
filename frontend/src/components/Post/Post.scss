@@ -96,6 +96,11 @@
           line-height: 24px;
           font-weight: bold;
           cursor: pointer;
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
         }
       }
       .comments-section {
