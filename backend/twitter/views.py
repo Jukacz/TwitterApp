@@ -312,6 +312,8 @@ class HashtagView(generics.GenericAPIView):
         hashtag = get_object_or_404(Hashtag, name=name)
         tweets = TweetHashtag.objects.filter(hashtag=hashtag).order_by('-tweet__created_at')
         tweets = [self.serializer_class(t.tweet).data for t in tweets]
+        for i in tweets:
+            i['already_liked'] = Like.objects.filter(user__user=request.user, tweet__uuid=i['uuid']).exists()
         return Response(status=HTTP_200_OK, data={'tweets': tweets, 'success': True})
 
 class LastTenHashtagsView(generics.GenericAPIView):
