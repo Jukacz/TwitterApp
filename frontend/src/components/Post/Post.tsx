@@ -28,7 +28,7 @@ const Post: React.FC<PostProps> = (props) => {
   const navigate = useNavigate();
 
   const [licked, setLicked] = useState(liked);
-  const [you_liked, setYou_liked] = useState(false);
+  const [changedLike, setChangedLike] = useState(false);
   const [openedComments, setOpenedComments] = useState(false);
   const [comments, setComments] = useState<TweetComment[]>([]);
   const [commentAppend, setCommentAppend] = useState(0);
@@ -52,6 +52,7 @@ const Post: React.FC<PostProps> = (props) => {
         `${now.diff(tweetTime, "weeks") > 1 ? " weeks" : " week"}`
       );
     }
+    return diff.toString() + `${diff > 1 ? " hours" : " hour"}`;
   };
 
   const give_like = async () => {
@@ -64,6 +65,7 @@ const Post: React.FC<PostProps> = (props) => {
 
     if (response_from_like.data.success) {
       setLicked((state) => !state);
+      setChangedLike(true);
       return;
     }
     toast({
@@ -185,7 +187,15 @@ const Post: React.FC<PostProps> = (props) => {
                 licked ? "licked-already" : ""
               }`}
             >
-              {licked ? likes_number + 1 : likes_number}{" "}
+              {changedLike
+                ? !licked
+                  ? liked
+                    ? likes_number - 1
+                    : likes_number
+                  : liked
+                  ? likes_number
+                  : likes_number + 1
+                : likes_number}{" "}
               <FontAwesomeIcon icon={faHeart} />
             </button>
             <button

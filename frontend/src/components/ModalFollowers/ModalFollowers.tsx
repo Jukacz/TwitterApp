@@ -14,11 +14,12 @@ import {
 import React, { useEffect, useState } from "react";
 import { ModalProps, UserInterface } from "./interface";
 import requestToApi from "../axios";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const ModalFollowers: React.FC<ModalProps> = ({ mode, username, children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [users, setUsers] = useState<UserInterface[]>([]);
+  const navigate = useNavigate();
   useEffect(() => {
     const init = async () => {
       const response = await requestToApi
@@ -58,9 +59,19 @@ const ModalFollowers: React.FC<ModalProps> = ({ mode, username, children }) => {
             {mode === "followers" ? "Obserwujący" : "Obserwuje"}
           </ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
+          <ModalBody className="modal-body">
+            {users.length === 0 && (
+              <h1>
+                {mode !== "followers"
+                  ? "Ten użytkownik nie obserwuje nikogo"
+                  : "Tego użytkownika nikt nie obserwuje"}
+              </h1>
+            )}
             {users.map((user) => (
-              <div className="user-card">
+              <div
+                className="user-card"
+                onClick={() => navigate(`/${user.username}`)}
+              >
                 <img src="https://picsum.photos/200" alt="zdjecie profilowe" />
                 <div className="user-card-text">
                   <NavLink className="first_name" to={`/${user.username}`}>
